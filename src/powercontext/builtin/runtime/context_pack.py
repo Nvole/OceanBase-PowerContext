@@ -35,6 +35,8 @@ _PACK_FIELDS = frozenset({"schema", "items", "digest", "byte_count"})
 _DELTA_FIELDS = frozenset({"schema", "base_digest", "target_digest", "prefix_items", "appended"})
 _DIGEST_RE = re.compile(r"sha256:[0-9a-f]{64}")
 _B64_RE = re.compile(r"^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$")
+_JSON_STRING_TOKEN = re.compile(rb'"(?:[^"\\]|\\.)*"')
+_JSON_INTEGER_VALUE = re.compile(rb"\s*:\s*(?=[0-9])")
 
 
 class ContextPackError(Exception):
@@ -70,6 +72,18 @@ class ContextPack:
             data = content.encode("utf-8")
         except UnicodeEncodeError as error:
             raise ContextPackError("content is not valid Unicode") from error
+        # Keep a changing JSON revision separate from the stable evidence before it.
+        # Consume whole strings so quoted data cannot impersonate a metadata key.
+        for token in _JSON_STRING_TOKEN.finditer(data):
+            if token.group() != b'"revision"':
+                continue
+            value = _JSON_INTEGER_VALUE.match(data, token.end())
+            if value is not None:
+                boundary = value.end()
+                return cls.build((
+                    *_split_utf8(data[:boundary], min(64, chunk_bytes)),
+                    *_split_utf8(data[boundary:], chunk_bytes),
+                ))
         return cls.build(_split_utf8(data, chunk_bytes))
 
     def to_bytes(self) -> bytes:

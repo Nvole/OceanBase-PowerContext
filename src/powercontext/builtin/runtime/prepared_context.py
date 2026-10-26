@@ -28,6 +28,7 @@ from powercontext.builtin.artifacts.memory.models import MemoryCitation, MemoryH
 from powercontext.builtin.artifacts.profile.models import Profile
 from powercontext.builtin.artifacts.topic_memory import TopicMemory, TopicMemorySearchHit
 from powercontext.builtin.runtime.errors import PreparedContextInvariantError
+from powercontext.builtin.runtime.evidence_selection import evidence_candidates
 from powercontext.builtin.runtime.models import PrepareContextRequest, PreparedContext
 from powercontext.builtin.runtime.prepared_code import (
     CodeEvidenceRef,
@@ -40,7 +41,6 @@ from powercontext.builtin.runtime.prepared_text import (
     fit_context_text_item,
     render_context_text,
 )
-from powercontext.builtin.runtime.evidence_selection import evidence_candidates
 from powercontext.builtin.runtime.recall_sufficiency import RecallBudgetView
 
 _MIN_TRUNCATED_CONTENT_BYTES = 64
@@ -580,7 +580,12 @@ class PreparedContextBuilder:
                 entry_version_id=hit.entry_version_id,
             )
             origin: PreparedContextOrigin = citation
-            rendered_citation = citation.model_dump(mode="json")
+            # Entry identity is stable across head advances; keep the snapshot reference last.
+            rendered_citation = {
+                "entry_id": citation.entry_id,
+                "entry_version_id": citation.entry_version_id,
+                "memory_ref": citation.memory_ref.model_dump(mode="json"),
+            }
             if scope_id is not None:
                 memory = ArtifactAddress(scope_id=scope_id, artifact=hit.memory_ref)
                 origin = MemoryEntryAddress(
@@ -589,9 +594,9 @@ class PreparedContextBuilder:
                     entry_version_id=hit.entry_version_id,
                 )
                 rendered_citation = {
-                    "memory": memory.model_dump(mode="json"),
                     "entry_id": hit.entry_id,
                     "entry_version_id": hit.entry_version_id,
+                    "memory": memory.model_dump(mode="json"),
                 }
             memory_entries.append(
                 _PreparedContextEntry(
@@ -993,19 +998,17 @@ def _render_evidence(fragments: Sequence[PreparedEvidenceFragment]) -> str:
     items: list[dict[str, object]] = []
     for fragment in fragments:
         memory = fragment.address.memory
-        items.append(
-            {
-                "citation": {
-                    "scope_id": memory.scope_id,
-                    "memory_ref": memory.artifact.model_dump(mode="json"),
-                    "entry_id": fragment.address.entry_id,
-                    "entry_version_id": fragment.address.entry_version_id,
-                },
-                "content": fragment.text,
-                "start": fragment.start,
-                "end": fragment.end,
-            }
-        )
+        items.append({
+            "citation": {
+                "scope_id": memory.scope_id,
+                "memory_ref": memory.artifact.model_dump(mode="json"),
+                "entry_id": fragment.address.entry_id,
+                "entry_version_id": fragment.address.entry_version_id,
+            },
+            "content": fragment.text,
+            "start": fragment.start,
+            "end": fragment.end,
+        })
     encoded = json.dumps({"trust": "untrusted_history", "items": items}, ensure_ascii=False, separators=(",", ":"))
     return "\n\n".join((TRUST_POLICY, f"{_BEGIN_MARKER}\n{encoded}\n{_END_MARKER}"))
 
@@ -1066,13 +1069,14 @@ def _text_item(entry: _PreparedContextEntry) -> ContextTextItem:
 
 
 def _render_entry(entry: _PreparedContextEntry) -> dict[str, object]:
+    # Render evidence before the changing snapshot reference so prefix deltas can retain it.
     rendered: dict[str, object] = {
-        "citation": entry.citation,
         "content": entry.content,
         "truncated": entry.truncated,
     }
     if entry.kind != "memory":
         rendered["kind"] = entry.kind
+    rendered["citation"] = entry.citation
     return rendered
 
 

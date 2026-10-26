@@ -866,12 +866,7 @@ class ScopedContextApplication:
         """
 
         prepared = await self.prepare(request, authorize_scopes=authorize_scopes)
-        # Smaller than the default keeps a shared text prefix aligned when the suffix changes.
-        # UTF-8 code points are at most 4 bytes, so 128 always has a legal boundary.
-        target = ContextPack.from_content(
-            "" if prepared.content is None else prepared.content,
-            chunk_bytes=128,
-        )
+        target = ContextPack.from_content("" if prepared.content is None else prepared.content)
         if base_pack is None:
             return target
         if not isinstance(base_pack, ContextPack):

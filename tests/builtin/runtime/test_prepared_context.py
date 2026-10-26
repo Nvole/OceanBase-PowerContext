@@ -34,6 +34,7 @@ from powercontext.builtin.runtime.application import (
     _limit_expanded_experience_candidates,
     _limit_expanded_memory_candidates,
 )
+from powercontext.builtin.runtime.context_pack import ContextPack, ContextPackDelta, apply_context_pack_delta
 from powercontext.builtin.runtime.errors import PreparedContextInvariantError
 from powercontext.builtin.runtime.prepared_code import CodeEvidenceRef, PreparedCodeCandidate, code_candidates
 from powercontext.builtin.runtime.prepared_context import (
@@ -459,6 +460,85 @@ def test_builder_rejects_a_hit_from_a_different_memory_head() -> None:
             hits=(_hit("other", "Other head", memory_ref=other_ref),),
             request=PrepareContextRequest(query="head"),
         )
+
+
+@pytest.mark.parametrize("referenced_scope", [False, True])
+def test_incremental_context_reuses_evidence_when_only_its_memory_head_advances(referenced_scope: bool) -> None:
+    text = "Keep this retrieved evidence available when unrelated memory entries are appended. " * 15
+    request = PrepareContextRequest(query="retrieved evidence", max_bytes=4096)
+    receiver = None
+    raw_bytes = wire_bytes = 0
+    for revision in range(1, 41):
+        memory_ref = MEMORY_REF.model_copy(update={"revision": revision})
+        prepared = (
+            PreparedContextBuilder()
+            .build_scopes_result(
+                request=request,
+                current_scope_id="current",
+                memory_candidates=(
+                    PreparedMemoryCandidates(
+                        scope_id="shared" if referenced_scope else "current",
+                        memory_ref=memory_ref,
+                        hits=(_hit("stable-entry", text, memory_ref=memory_ref),),
+                    ),
+                ),
+            )
+            .context
+        )
+        assert prepared.content is not None
+        item = _items(prepared.content)[0]
+        assert item["content"] == text
+        assert item["truncated"] is False
+        if referenced_scope:
+            assert item["citation"]["memory"] == ArtifactAddress(scope_id="shared", artifact=memory_ref).model_dump(
+                mode="json"
+            )
+        else:
+            assert item["citation"]["memory_ref"] == memory_ref.model_dump(mode="json")
+        target = ContextPack.from_content(prepared.content, chunk_bytes=128)
+        raw_bytes += prepared.content_bytes
+        if receiver is None:
+            wire = target.to_bytes()
+            receiver = ContextPack.from_bytes(wire)
+        else:
+            delta = ContextPackDelta.between(receiver, target)
+            wire = delta.to_bytes()
+            receiver = apply_context_pack_delta(receiver, ContextPackDelta.from_bytes(wire))
+        wire_bytes += len(wire)
+        assert b"".join(receiver.items) == prepared.content.encode("utf-8")
+    assert 1 - wire_bytes / raw_bytes >= 0.45
+
+
+def test_prepared_pack_reuses_quoted_unicode_evidence_before_the_actual_revision() -> None:
+    text = '历史日志包含 {"revision":999}, 这是证据原文而不是引用元数据. \u2028🚀 ' * 12
+    prepared = []
+    for revision in (9, 10):
+        memory_ref = MEMORY_REF.model_copy(update={"revision": revision})
+        context = PreparedContextBuilder().build(
+            memory_ref=memory_ref,
+            hits=(_hit("quoted-evidence", text, memory_ref=memory_ref),),
+            request=PrepareContextRequest(query="历史日志", max_bytes=4096),
+        )
+        assert context.content is not None
+        prepared.append(context.content)
+    base, target = (ContextPack.from_content(content) for content in prepared)
+    delta = ContextPackDelta.between(base, target)
+    retained = b"".join(base.items[: delta.prefix_items])
+    assert json.dumps(text, ensure_ascii=False)[1:-1].encode() in retained
+    assert all(len(item) <= 512 and item.decode("utf-8") for item in (*base.items, *target.items))
+    received = apply_context_pack_delta(
+        ContextPack.from_bytes(base.to_bytes()), ContextPackDelta.from_bytes(delta.to_bytes())
+    )
+    assert b"".join(received.items).decode() == prepared[1]
+
+
+@pytest.mark.parametrize("content", ["", "plain text 海洋🚀", 'a quoted "revision":1 outside a prepared envelope'])
+def test_prepared_pack_preserves_empty_and_unstructured_content(content: str) -> None:
+    pack = ContextPack.from_content(content)
+    assert b"".join(pack.items).decode() == content
+    assert all(len(item) <= 512 and item.decode("utf-8") for item in pack.items)
+    if not content:
+        assert pack.items == ()
 
 
 def test_builder_prepares_experience_without_a_memory_head_and_keeps_v1_envelope() -> None:

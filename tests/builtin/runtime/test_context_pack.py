@@ -146,3 +146,22 @@ def test_deeply_nested_wrong_shaped_json_raises_protocol_error(decoder: Callable
 
     with pytest.raises(ContextPackError):
         decoder(malformed)
+
+
+@pytest.mark.parametrize("chunk_bytes", [4, 7, 64, 128, 512, 1024])
+def test_revision_boundary_chunks_preserve_unicode_and_the_callers_capacity(chunk_bytes: int) -> None:
+    content = json.dumps(
+        {"content": '海洋🚀, quoted {"revision":999} remains evidence. ' * 15, "revision": 12},
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    pack = ContextPack.from_content(content, chunk_bytes=chunk_bytes)
+    assert b"".join(pack.items).decode() == content
+    assert all(len(item) <= chunk_bytes and item.decode("utf-8") for item in pack.items)
+    assert pack.to_bytes() == ContextPack.from_content(content, chunk_bytes=chunk_bytes).to_bytes()
+
+
+@pytest.mark.parametrize("chunk_bytes", [1, 2, 3])
+def test_revision_boundary_does_not_relax_an_impossible_utf8_capacity(chunk_bytes: int) -> None:
+    with pytest.raises(ContextPackError):
+        ContextPack.from_content('{"content":"🚀","revision":12}', chunk_bytes=chunk_bytes)

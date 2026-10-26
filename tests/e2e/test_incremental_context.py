@@ -65,6 +65,7 @@ def test_incremental_prepare_preserves_query_selection_and_empty_results() -> No
 
             first = await context.prepare_incremental(request)
             assert isinstance(first, ContextPack)
+            assert first.to_bytes() == ContextPack.from_content(ordinary.content).to_bytes()
             base = ContextPack.from_bytes(first.to_bytes())
             assert b"".join(base.items) == ordinary.content.encode()
             empty_request = PrepareContextRequest(query="zzzxynonexistent", max_bytes=16000)
@@ -79,5 +80,6 @@ def test_incremental_prepare_preserves_query_selection_and_empty_results() -> No
             assert isinstance(next_delta, ContextPackDelta)
             replay = apply_context_pack_delta(restored, ContextPackDelta.from_bytes(next_delta.to_bytes()))
             assert b"".join(replay.items) == ordinary.content.encode()
+            assert replay.to_bytes() == ContextPack.from_content(ordinary.content).to_bytes()
 
     asyncio.run(scenario())
