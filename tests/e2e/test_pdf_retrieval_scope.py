@@ -64,17 +64,39 @@ def test_pdf_search_preserves_named_document_scope_and_filters_other_sources(tmp
                 text="Commercial clients include national retailers. Annual revenue was 500.",
             ),
             PDFPageInput(
-                document_id="3M_2022_10K",
+                document_id="3M_2018_10K",
+                document_sha256="d" * 64,
+                page_number=1,
+                text="Industrial clients include local distributors. Annual revenue was 100.",
+            ),
+            PDFPageInput(
+                document_id="3M_2023Q2_10Q",
                 document_sha256="c" * 64,
                 page_number=1,
                 text="Industrial clients include regional distributors. Annual revenue was 300.",
+            ),
+            PDFPageInput(
+                document_id="3M_1Q2022_10Q",
+                document_sha256="e" * 64,
+                page_number=1,
+                text="Industrial clients include overseas distributors. Annual revenue was 200.",
             ),
             *(
                 PDFPageInput(
                     document_id="ORION_CORPORATION_2022_10K",
                     document_sha256="b" * 64,
                     page_number=index,
-                    text=f"Primary customers accounted for 80 percent of revenue. Customer disclosure {index}.",
+                    text=(
+                        "Trading Symbol Name of each exchange Common Stock ORIN New York Stock Exchange "
+                        "Preferred Stock CASH New York Stock Exchange "
+                        "Class B ON Nasdaq Exchange "
+                        "Consolidated Balance Shee t Assets Cash 20 Inventory 50 "
+                        "Property plant equipment net 500 Liabilities 100 Equity 470"
+                        if index == 1
+                        else "Consolidated Statements of Income Sales 600 Cost of goods sold 400 Income 200"
+                        if index == 2
+                        else f"Primary customers accounted for 80 percent of revenue. Customer disclosure {index}."
+                    ),
                 )
                 for index in range(1, 25)
             ),
@@ -114,14 +136,38 @@ def test_pdf_search_preserves_named_document_scope_and_filters_other_sources(tmp
 
             named = await returned_labels("Who are Nebula's primary customers as of FY2022?", 20)
             assert named == ["NEBULA_2022_10K"]
-            alphanumeric = await returned_labels("Who are 3M's primary customers as of FY2022?", 20)
-            assert alphanumeric == ["3M_2022_10K"]
+            alphanumeric = await returned_labels("Who are 3M's primary customers as of Q2 FY2023?", 20)
+            assert alphanumeric == ["3M_2023Q2_10Q"]
+            both_periods = await returned_labels("What revenue did 3M report?", 3)
+            assert set(both_periods) == {"3M_2018_10K", "3M_2023Q2_10Q", "3M_1Q2022_10Q"}
+            ticker = await returned_labels("Who are $ORIN's primary customers?", 25)
+            assert set(ticker) == {"ORION_CORPORATION_2022_10K"}
+            explicit_ticker = await returned_labels("Who are $ON's primary customers?", 25)
+            assert set(explicit_ticker) == {"ORION_CORPORATION_2022_10K"}
             comparison = await returned_labels("Compare the revenues of Nebula and Orion in 2022.", 25)
             assert set(comparison) == {"NEBULA_2022_10K", "ORION_CORPORATION_2022_10K"}
-            unknown_alias = await returned_labels("Compare revenues of Nebula versus Northern Lights in 2022.", 26)
-            assert set(unknown_alias) == {"NEBULA_2022_10K", "ORION_CORPORATION_2022_10K", "3M_2022_10K"}
-            unnamed = await returned_labels("What revenue was reported in 2022?", 26)
-            assert set(unnamed) == {"NEBULA_2022_10K", "ORION_CORPORATION_2022_10K", "3M_2022_10K"}
-            assert len(unnamed) == 26
+            unknown_alias = await returned_labels("Compare revenues of Nebula versus Northern Lights in 2022.", 28)
+            expected_labels = {
+                "NEBULA_2022_10K",
+                "ORION_CORPORATION_2022_10K",
+                "3M_2018_10K",
+                "3M_2023Q2_10Q",
+                "3M_1Q2022_10Q",
+            }
+            assert set(unknown_alias) == expected_labels
+            unnamed = await returned_labels("What revenue was reported in 2022?", 28)
+            assert set(unnamed) == expected_labels
+            assert len(unnamed) == 28
+            natural_word = await returned_labels("What CASH and revenue were reported?", 28)
+            assert set(natural_word) == set(unnamed)
+            capitalized_stopword = await returned_labels("What return ON assets and revenue was reported?", 28)
+            assert set(capitalized_stopword) == set(unnamed)
+            balance_citations = await search_pdf_pages(memory, "What was Orion's net PPNE in 2022?", limit=1)
+            balance = await memory.get(GetMemoryEntryRequest(citation=balance_citations[0]))
+            assert "Consolidated Balance Shee t" in balance.entry.text
+            ratio_citations = await search_pdf_pages(memory, "What was Orion's inventory turnover?", limit=2)
+            ratio_pages = [await memory.get(GetMemoryEntryRequest(citation=citation)) for citation in ratio_citations]
+            assert any("Balance Shee t" in record.entry.text for record in ratio_pages)
+            assert any("Statements of Income" in record.entry.text for record in ratio_pages)
 
     asyncio.run(scenario())

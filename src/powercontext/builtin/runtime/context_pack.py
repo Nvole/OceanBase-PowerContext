@@ -75,7 +75,7 @@ class ContextPack:
     def to_bytes(self) -> bytes:
         """Serialize this pack in canonical JSON."""
 
-        return _canonical_pack_bytes(_encode_items(self.items), self.digest)
+        return _validated_pack_bytes(self)
 
     @classmethod
     def from_bytes(cls, data: bytes) -> ContextPack:
@@ -113,8 +113,8 @@ class ContextPackDelta:
 
         if not isinstance(base, ContextPack) or not isinstance(target, ContextPack):
             raise ContextPackError("pack endpoints")
-        _require_consistent(base)
-        _require_consistent(target)
+        _validated_pack_bytes(base)
+        _validated_pack_bytes(target)
         shared = 0
         limit = min(len(base.items), len(target.items))
         while shared < limit and base.items[shared] == target.items[shared]:
@@ -129,6 +129,7 @@ class ContextPackDelta:
     def to_bytes(self) -> bytes:
         """Serialize this delta in canonical JSON. ``byte_count`` is not a field."""
 
+        _validate_delta_fields(self)
         payload = {
             "schema": DELTA_SCHEMA,
             "base_digest": self.base_digest,
@@ -145,21 +146,14 @@ class ContextPackDelta:
         payload = _load_object(_raw_bytes(data), _DELTA_FIELDS)
         if payload.get("schema") != DELTA_SCHEMA:
             raise ContextPackError("delta schema")
-        base_digest = payload.get("base_digest")
-        target_digest = payload.get("target_digest")
-        prefix_items = payload.get("prefix_items")
-        if not isinstance(base_digest, str) or _DIGEST_RE.fullmatch(base_digest) is None:
-            raise ContextPackError("base digest")
-        if not isinstance(target_digest, str) or _DIGEST_RE.fullmatch(target_digest) is None:
-            raise ContextPackError("target digest")
-        if type(prefix_items) is not int or prefix_items < 0:
-            raise ContextPackError("prefix_items")
-        return cls(
-            base_digest=base_digest,
-            target_digest=target_digest,
-            prefix_items=prefix_items,
+        delta = cls(
+            base_digest=payload["base_digest"],
+            target_digest=payload["target_digest"],
+            prefix_items=payload["prefix_items"],
             appended=_decode_items(payload.get("appended")),
         )
+        _validate_delta_fields(delta)
+        return delta
 
     @property
     def byte_count(self) -> int:
@@ -173,13 +167,12 @@ def apply_context_pack_delta(base: ContextPack, delta: ContextPackDelta) -> Cont
 
     if not isinstance(base, ContextPack) or not isinstance(delta, ContextPackDelta):
         raise ContextPackError("delta endpoints")
-    _require_consistent(base)
+    _validated_pack_bytes(base)
+    _validate_delta_fields(delta)
     if delta.base_digest != base.digest:
         raise ContextPackError("base digest")
-    if type(delta.prefix_items) is not int or delta.prefix_items < 0 or delta.prefix_items > len(base.items):
+    if delta.prefix_items > len(base.items):
         raise ContextPackError("prefix_items")
-    if type(delta.appended) is not tuple or any(type(item) is not bytes for item in delta.appended):
-        raise ContextPackError("appended")
     rebuilt = ContextPack.build(base.items[: delta.prefix_items] + delta.appended)
     if rebuilt.digest != delta.target_digest:
         raise ContextPackError("target digest")
@@ -249,12 +242,30 @@ def _pack_document(items_b64: list[str], digest: str, byte_count: int) -> bytes:
     return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
-def _require_consistent(pack: ContextPack) -> None:
+def _validated_pack_bytes(pack: ContextPack) -> bytes:
     if type(pack.items) is not tuple or any(type(item) is not bytes for item in pack.items):
         raise ContextPackError("items")
     expected = _digest_for(pack.items)
-    if pack.digest != expected or pack.byte_count != len(pack.to_bytes()):
+    encoded = _canonical_pack_bytes(_encode_items(pack.items), expected)
+    if (
+        not isinstance(pack.digest, str)
+        or pack.digest != expected
+        or type(pack.byte_count) is not int
+        or pack.byte_count != len(encoded)
+    ):
         raise ContextPackError("pack check")
+    return encoded
+
+
+def _validate_delta_fields(delta: ContextPackDelta) -> None:
+    if not isinstance(delta.base_digest, str) or _DIGEST_RE.fullmatch(delta.base_digest) is None:
+        raise ContextPackError("base digest")
+    if not isinstance(delta.target_digest, str) or _DIGEST_RE.fullmatch(delta.target_digest) is None:
+        raise ContextPackError("target digest")
+    if type(delta.prefix_items) is not int or delta.prefix_items < 0:
+        raise ContextPackError("prefix_items")
+    if type(delta.appended) is not tuple or any(type(item) is not bytes for item in delta.appended):
+        raise ContextPackError("appended")
 
 
 def _split_utf8(data: bytes, chunk_bytes: int) -> tuple[bytes, ...]:
@@ -303,7 +314,7 @@ def _load_object(raw: bytes, fields: frozenset[str]) -> dict[str, Any]:
         payload = json.loads(text, object_pairs_hook=pairs)
     except ContextPackError:
         raise
-    except (json.JSONDecodeError, UnicodeError, ValueError) as error:
+    except (json.JSONDecodeError, UnicodeError, ValueError, RecursionError) as error:
         raise ContextPackError("json") from error
     if not isinstance(payload, dict) or set(payload) != fields:
         raise ContextPackError("field")

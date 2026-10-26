@@ -175,6 +175,11 @@ _STOPWORDS = frozenset({
 
 # Offline financial-language expansions. Weights are relative to original query terms.
 _SYNONYMS: dict[str, tuple[tuple[str, float], ...]] = {
+    "ppne": (("property", 1.0), ("plant", 1.0), ("equipment", 1.0)),
+    "ppe": (("property", 1.0), ("plant", 1.0), ("equipment", 1.0)),
+    "cogs": (("cost", 1.0), ("goods", 1.0), ("sold", 1.0), ("sales", 0.8)),
+    "retiree": (("retirement", 0.8), ("postretirement", 0.8), ("benefits", 0.5)),
+    "retirees": (("retirement", 0.8), ("postretirement", 0.8), ("benefits", 0.5)),
     "geography": (("geographic", 1.0), ("geographical", 1.0)),
     "geographies": (("geographic", 1.0), ("geographical", 1.0)),
     "geographic": (("geographical", 0.8), ("geography", 0.6)),
@@ -261,7 +266,18 @@ _POSITION_TITLES = (
     "statement of financial position",
     "statements of financial position",
 )
-_INCOME_QUERY = frozenset({"income", "ebitda", "margin", "operating", "earnings", "restructuring", "revenue"})
+_INCOME_QUERY = frozenset({
+    "income",
+    "ebitda",
+    "margin",
+    "operating",
+    "earnings",
+    "restructuring",
+    "revenue",
+    "revenues",
+    "cogs",
+    "turnover",
+})
 _CASH_QUERY = frozenset({
     "cash",
     "capex",
@@ -272,9 +288,31 @@ _CASH_QUERY = frozenset({
     "expenditures",
     "ebitda",
 })
-_POSITION_QUERY = frozenset({"balance", "asset", "assets", "liability", "liabilities", "equity", "debt"})
+_POSITION_QUERY = frozenset({
+    "balance",
+    "asset",
+    "assets",
+    "liability",
+    "liabilities",
+    "equity",
+    "debt",
+    "position",
+    "ppne",
+    "ppe",
+    "property",
+    "equipment",
+    "inventory",
+    "inventories",
+    "turnover",
+    "quick",
+    "liquidity",
+})
 
 _PHRASE_REWRITES: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\bp\s*p\s*&\s*e\b", re.IGNORECASE), " ppe property plant equipment "),
+    (re.compile(r"\bcapital[\s-]+intensive\b", re.IGNORECASE), " capital intensive property plant equipment revenue "),
+    (re.compile(r"\bgross\s+margin\b", re.IGNORECASE), " gross margin cost goods sold sales "),
+    (re.compile(r"\binventory\s+turnover\b", re.IGNORECASE), " inventory turnover cost goods sold "),
     (re.compile(r"\bp\s*&\s*l\b", re.IGNORECASE), " income statement profit loss "),
     (re.compile(r"\bd\s*&\s*a\b", re.IGNORECASE), " depreciation amortization "),
     (re.compile(r"\bfy\s*((?:19|20)\d{2})\b", re.IGNORECASE), r" \1 "),
@@ -637,11 +675,10 @@ def _question_documents(records: Sequence[_PageRecord], question: str) -> tuple[
     """
 
     question_words = re.findall(r"[a-z0-9]+", question.lower())
-    labels = {record.text.partition("\n")[0] for record in records}
+    keys_by_label = _document_query_keys(records, _explicit_query_symbols(question))
     matched: set[str] = set()
     matched_names: set[str] = set()
-    for label in labels:
-        keys = _document_name_keys(label)
+    for label, keys in keys_by_label.items():
         if not keys:
             continue
         longest = max(map(len, keys))
@@ -661,6 +698,19 @@ def _question_documents(records: Sequence[_PageRecord], question: str) -> tuple[
     if not matched or (comparison and len(matched_names) < 2):
         return tuple(records)
     return tuple(record for record in records if record.text.partition("\n")[0] in matched)
+
+
+def _document_query_keys(records: Sequence[_PageRecord], symbols: set[str]) -> dict[str, set[str]]:
+    """Collect issuer names and disclosed trading symbols from stored page evidence."""
+
+    keys_by_label: dict[str, set[str]] = {}
+    for record in records:
+        label = record.text.partition("\n")[0]
+        if label not in keys_by_label:
+            keys_by_label[label] = _document_name_keys(label)
+        if symbols:
+            keys_by_label[label].update(_document_trading_symbols(record.text).intersection(symbols))
+    return keys_by_label
 
 
 def _document_name_keys(label: str) -> set[str]:
@@ -683,7 +733,7 @@ def _document_name_keys(label: str) -> set[str]:
         if len(word) > 1
         and not word.isdecimal()
         and word not in report_words
-        and re.fullmatch(r"(?:fy)?\d{2,4}|\d+[kq]", word) is None
+        and re.fullmatch(r"(?:fy)?\d{2,4}(?:q[1-4])?|q[1-4](?:\d{2,4})?|[1-4]q(?:\d{2,4})?|\d+[kq]", word) is None
     ]
     key = "".join(words)
     if len(key) < 2 or (len(key) == 2 and key.isalpha()):
@@ -693,6 +743,25 @@ def _document_name_keys(label: str) -> set[str]:
         if key.endswith(suffix) and len(key) - len(suffix) >= 3:
             keys.add(key[: -len(suffix)])
     return keys
+
+
+def _explicit_query_symbols(question: str) -> set[str]:
+    words = re.findall(r"\b[A-Za-z][A-Za-z0-9]{1,7}\b", question)
+    symbols = {word.lower() for word in words if sum(char.isupper() for char in word) >= 2}
+    explicit = {word.lower() for word in re.findall(r"\$([A-Za-z][A-Za-z0-9]{1,7})\b", question)}
+    financial = {"usd", "fy", "roa", "roe", "ebit", "ebitda", "ppne", "ppe", "cogs", "dpo", "dso", "eps", "gaap", "sec"}
+    return symbols.difference(financial, _SYNONYMS, _STOPWORDS, _INCOME_QUERY, _POSITION_QUERY, _CASH_QUERY) | explicit
+
+
+def _document_trading_symbols(text: str) -> set[str]:
+    heading = re.search(r"\btrading\s+symbols?(?:\s*\(s\))?", text, re.IGNORECASE)
+    if heading is None:
+        return set()
+    table = text[heading.end() : heading.end() + 5000]
+    return {
+        symbol.lower()
+        for symbol in re.findall(r"\b([A-Z][A-Z0-9]{1,7})\s+(?:The\s+)?(?:New\s+York|NASDAQ|Nasdaq|NYSE)\b", table)
+    }
 
 
 def _focused_terms(question: str) -> list[str]:
@@ -778,14 +847,14 @@ def _bigram_bonus(counts: Mapping[str, int], terms: Sequence[str], inverse: Mapp
 def _title_bonus(tokens: Sequence[str], query_terms: set[str]) -> float:
     """Prefer the face of a financial statement when the question names that statement."""
 
-    head = " ".join(tokens[:80])
+    head = "".join(tokens[:80])
     bonus = 0.0
-    if query_terms & _INCOME_QUERY and any(title in head for title in _INCOME_TITLES):
-        bonus += 6.0
-    if query_terms & _CASH_QUERY and any(title in head for title in _CASH_TITLES):
-        bonus += 6.0
-    if query_terms & _POSITION_QUERY and any(title in head for title in _POSITION_TITLES):
-        bonus += 4.0
+    if query_terms & _INCOME_QUERY and any(title.replace(" ", "") in head for title in _INCOME_TITLES):
+        bonus += 12.0
+    if query_terms & _CASH_QUERY and any(title.replace(" ", "") in head for title in _CASH_TITLES):
+        bonus += 12.0
+    if query_terms & _POSITION_QUERY and any(title.replace(" ", "") in head for title in _POSITION_TITLES):
+        bonus += 8.0
     return bonus
 
 
@@ -843,7 +912,8 @@ def _concept_bonus(text: str, query_terms: set[str]) -> float:
     density = number_count / len(tokens)
     bonus = 0.0
     consolidated = "consolidated" in lowered
-    balance_sheet = "balance sheet" in lowered
+    head = "".join(tokens[:80])
+    balance_sheet = "balance sheet" in lowered or any(title.replace(" ", "") in head for title in _POSITION_TITLES)
     operations = any(
         phrase in lowered
         for phrase in (
@@ -855,10 +925,10 @@ def _concept_bonus(text: str, query_terms: set[str]) -> float:
             "statement of earnings",
         )
     )
-    wants_balance = bool(query_terms & {"quick", "liquidity", "balance", "liability", "liabilities", "asset", "assets"})
+    wants_balance = bool(query_terms & _POSITION_QUERY)
     if wants_balance and consolidated and balance_sheet:
         bonus += 12.0 + 45.0 * density
-    wants_results = bool(query_terms & {"tax", "taxes", "ebitda", "margin", "restructuring"})
+    wants_results = bool(query_terms & (_INCOME_QUERY | {"tax", "taxes", "inventory"}))
     if wants_results and consolidated and operations:
         bonus += 10.0 + 35.0 * density
     asks_categories = bool(query_terms & {"product", "products", "service", "services", "category", "categories"})
