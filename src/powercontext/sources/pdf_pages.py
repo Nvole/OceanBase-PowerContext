@@ -34,7 +34,6 @@ from powercontext.sources.projections import TextEvidence
 
 _TOKEN = re.compile(r"[a-z]+|\d+")
 _SHA256 = re.compile(r"[0-9a-f]{64}\Z")
-_MAX_ENTRY_TEXT_BYTES = 8192
 _BM25_K1 = 1.2
 _BM25_B = 0.75
 _SEARCH_POOL = 80
@@ -406,7 +405,7 @@ def parse_pdf_document(value: PDFDocumentInput) -> tuple[PDFPageInput, ...]:
             document_id=document.document_id,
             document_sha256=digest,
             page_number=page_number,
-            text=_prepare_page_text(document.document_id, text),
+            text=_prepare_page_text(text),
         )
         for page_number, text in enumerate(texts, start=1)
     )
@@ -488,41 +487,10 @@ def _extract_page_texts(content: bytes) -> tuple[str, ...]:
     return tuple(texts)
 
 
-def _entry_text(document_id: str, page_text: str) -> str:
-    return unicodedata.normalize("NFC", f"{document_id}\n{page_text}").strip()
+def _prepare_page_text(extracted: str) -> str:
+    """Normalize layout whitespace without removing any page content."""
 
-
-def _fits_memory_entry(document_id: str, page_text: str) -> bool:
-    return len(_entry_text(document_id, page_text).encode("utf-8")) <= _MAX_ENTRY_TEXT_BYTES
-
-
-def _prepare_page_text(document_id: str, extracted: str) -> str:
-    """Keep the extractable tokens while staying inside one Memory entry."""
-
-    if not extracted or not extracted.strip():
-        return ""
-    collapsed = unicodedata.normalize("NFC", " ".join(extracted.split())).strip()
-    if _fits_memory_entry(document_id, collapsed):
-        return collapsed
-    compact = unicodedata.normalize(
-        "NFC",
-        " ".join(re.sub(r"[^0-9A-Za-z]+", " ", collapsed).split()),
-    ).strip()
-    if _fits_memory_entry(document_id, compact):
-        return compact
-    tokens = compact.split()
-    best = ""
-    low = 0
-    high = len(tokens)
-    while low <= high:
-        mid = (low + high) // 2
-        candidate = " ".join(tokens[:mid])
-        if _fits_memory_entry(document_id, candidate):
-            best = candidate
-            low = mid + 1
-        else:
-            high = mid - 1
-    return best
+    return unicodedata.normalize("NFC", " ".join(extracted.split()))
 
 
 def _rewrite_question(question: str) -> str:

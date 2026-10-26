@@ -78,11 +78,23 @@ def canonical_json(value: object) -> bytes:
     return rfc8785.dumps(_validated_json(value))
 
 
-def normalize_text(value: str) -> str:
-    """Normalize and validate one durable entry body."""
+def normalize_text(value: str, *, source_refs: Sequence[object] = ()) -> str:
+    """Normalize a durable body, preserving complete single-page PDF evidence.
+
+    A PDF page is an indivisible evidence unit: its persisted text and exact citation
+    must retain the full page. Other entries keep the ordinary 8192-byte bound.
+    The same source-aware rule is used when hashing and rebuilding saved versions.
+    """
 
     normalized = _normalize_non_empty_string(value, "memory entry text")
-    if len(normalized.encode("utf-8")) > 8192:
+    page_ref = source_refs[0] if len(source_refs) == 1 else None
+    complete_pdf_page = (
+        isinstance(page_ref, Mapping)
+        and page_ref.get("source_type") == "pdf-page"
+        and isinstance(page_ref.get("source_id"), str)
+        and bool(page_ref.get("source_id"))
+    )
+    if not complete_pdf_page and len(normalized.encode("utf-8")) > 8192:
         raise _CanonicalValueError("text-too-long")
     return normalized
 
@@ -158,10 +170,11 @@ def entry_content_bytes(
 ) -> bytes:
     """Return canonical content bytes for an immutable entry version."""
 
+    canonical_sources = normalize_refs(source_refs)
     return canonical_json({
         "kind": normalize_kind(kind),
-        "text": normalize_text(text),
-        "source_refs": normalize_refs(source_refs),
+        "text": normalize_text(text, source_refs=canonical_sources),
+        "source_refs": canonical_sources,
         "artifact_refs": normalize_refs(artifact_refs),
     })
 
