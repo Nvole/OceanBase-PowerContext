@@ -166,6 +166,7 @@ from powercontext.builtin.runtime._scope_cache import (
     ScopeCacheObserver,
     ScopeEvictor,
 )
+from powercontext.builtin.runtime.context_pack import ContextPack, ContextPackDelta, ContextPackError
 from powercontext.builtin.runtime.decision_model import DecisionModel
 from powercontext.builtin.runtime.errors import InvalidRuntimeRequestError, TopicMemoryProcessingUnavailableError
 from powercontext.builtin.runtime.models import (
@@ -848,6 +849,34 @@ class ScopedContextApplication:
             if authorize_scopes is not None:
                 await authorize_scopes((self.scope_id, *scope.context_references))
             return await self._prepare(request, scope)
+
+    async def prepare_incremental(
+        self,
+        request: PrepareContextRequest,
+        /,
+        base_pack: ContextPack | None = None,
+        *,
+        authorize_scopes: Callable[[tuple[str, ...]], Awaitable[None]] | None = None,
+    ) -> ContextPack | ContextPackDelta:
+        """Send a full pack, or a delta from a pack the caller already holds.
+
+        The target bytes are exactly the ordinary ``prepare`` content. An empty result
+        (``content is None``) is an empty pack. The caller reconstructs the next pack from the
+        serialized base and delta, without Runtime state.
+        """
+
+        prepared = await self.prepare(request, authorize_scopes=authorize_scopes)
+        # Smaller than the default keeps a shared text prefix aligned when the suffix changes.
+        # UTF-8 code points are at most 4 bytes, so 128 always has a legal boundary.
+        target = ContextPack.from_content(
+            "" if prepared.content is None else prepared.content,
+            chunk_bytes=128,
+        )
+        if base_pack is None:
+            return target
+        if not isinstance(base_pack, ContextPack):
+            raise ContextPackError("base pack")
+        return ContextPackDelta.between(base_pack, target)
 
     async def _prepare(self, request: PrepareContextRequest, scope: ScopeDescriptor, /) -> PreparedContext:
         build, effort = await self._prepare_build(request, scope)
