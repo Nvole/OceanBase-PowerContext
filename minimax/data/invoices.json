@@ -1,0 +1,7 @@
+[
+  {"id": "A", "amount": 10, "status": "open", "invoice_date": "2024-01-01"},
+  {"id": "B", "amount": 50, "status": "paid", "invoice_date": "2024-02-15"},
+  {"id": "C", "amount": 80, "status": "open", "invoice_date": "2024-03-20"},
+  {"id": "D", "amount": 50, "status": "void", "invoice_date": "2024-02-15"},
+  {"id": "E", "amount": 50, "status": "paid", "invoice_date": "2024-03-01"}
+]

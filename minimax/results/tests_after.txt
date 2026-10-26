@@ -1,0 +1,34 @@
+command: cd /data/zouyuanwei/oceanbase && . ./env.sh && PYTHONPATH=tracks/07_minimax_engineering_context/src uv run --locked python -m unittest discover -s tracks/07_minimax_engineering_context/tests -v
+code_file: src/lab/invoice_filter.py
+code_sha256: f10fbe8d3377ebb80c3a12d23eb21cebc2b4f181ff73adedacea2e767dad1a8c
+revision: date-range-applied
+
+
+test_changed_hit_text_replaces_the_sentence (test_context_unit.ContextAssemblyTests.test_changed_hit_text_replaces_the_sentence) ... ok
+test_retrieval_modules_do_not_name_materials (test_context_unit.ContextAssemblyTests.test_retrieval_modules_do_not_name_materials) ... ok
+test_sources_come_from_hit_metadata (test_context_unit.ContextAssemblyTests.test_sources_come_from_hit_metadata) ... ok
+test_terms_keep_full_tokens (test_context_unit.ContextAssemblyTests.test_terms_keep_full_tokens) ... ok
+test_filter_amount_and_status (test_invoice_filter.InvoiceFilterTests.test_filter_amount_and_status) ... ok
+test_filter_by_date_range (test_invoice_filter.InvoiceFilterTests.test_filter_by_date_range) ... ok
+test_filter_by_max_amount (test_invoice_filter.InvoiceFilterTests.test_filter_by_max_amount) ... ok
+test_filter_by_min_amount (test_invoice_filter.InvoiceFilterTests.test_filter_by_min_amount) ... ok
+test_filter_by_status (test_invoice_filter.InvoiceFilterTests.test_filter_by_status) ... ok
+test_filter_date_accepts_date_objects (test_invoice_filter.InvoiceFilterTests.test_filter_date_accepts_date_objects) ... ok
+test_filter_date_end_only (test_invoice_filter.InvoiceFilterTests.test_filter_date_end_only) ... ok
+test_filter_date_inverted_range_is_empty (test_invoice_filter.InvoiceFilterTests.test_filter_date_inverted_range_is_empty) ... ok
+test_filter_date_single_day_inclusive (test_invoice_filter.InvoiceFilterTests.test_filter_date_single_day_inclusive) ... ok
+test_filter_date_start_only (test_invoice_filter.InvoiceFilterTests.test_filter_date_start_only) ... ok
+test_filter_date_uses_calendar_day (test_invoice_filter.InvoiceFilterTests.test_filter_date_uses_calendar_day) ... ok
+test_filter_date_with_amount_and_status (test_invoice_filter.InvoiceFilterTests.test_filter_date_with_amount_and_status) ... ok
+test_filter_does_not_mutate_input (test_invoice_filter.InvoiceFilterTests.test_filter_does_not_mutate_input) ... ok
+test_filter_min_amount_is_inclusive (test_invoice_filter.InvoiceFilterTests.test_filter_min_amount_is_inclusive) ... ok
+test_filter_status_is_case_sensitive (test_invoice_filter.InvoiceFilterTests.test_filter_status_is_case_sensitive) ... ok
+test_filter_without_constraints_preserves_order (test_invoice_filter.InvoiceFilterTests.test_filter_without_constraints_preserves_order) ... ok
+test_omitted_dates_do_not_filter (test_invoice_filter.InvoiceFilterTests.test_omitted_dates_do_not_filter) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.002s
+
+OK
+
+exit_code: 0

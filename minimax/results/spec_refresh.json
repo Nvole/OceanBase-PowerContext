@@ -1,0 +1,9 @@
+{
+  "source": "docs/invoice_filter_spec.md",
+  "before_reimport": [
+    "SPEC_SENTENCE: 日期筛选使用闭区间，边界当天的发票必须保留。"
+  ],
+  "after_reimport": [
+    "SPEC_SENTENCE: 日期筛选使用闭区间，边界当天的发票必须保留，并且只比较日历日。"
+  ]
+}

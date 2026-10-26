@@ -1,0 +1,55 @@
+{
+  "track": "03_amap_location_agent",
+  "title": "周边去哪儿：基于高德的地点推荐助手",
+  "items": [
+    {
+      "id": "s4-1",
+      "section": "四、提交材料",
+      "requirement": "Skill 的名称、用途和适用场景。",
+      "status": "done",
+      "evidence": "SKILL.md 第 1 节"
+    },
+    {
+      "id": "s4-2",
+      "section": "四、提交材料",
+      "requirement": "使用高德工具查询地点、获取步行路线、筛选推荐的步骤。",
+      "status": "done",
+      "evidence": "SKILL.md 第 3 节和第 4 节"
+    },
+    {
+      "id": "s4-3",
+      "section": "四、提交材料",
+      "requirement": "回答格式，以及结果不足、信息缺失或工具调用失败时的处理方式。",
+      "status": "done",
+      "evidence": "SKILL.md 第 5 节和第 6 节"
+    },
+    {
+      "id": "s3-1",
+      "section": "三、验收与评测",
+      "requirement": "普通推荐：推荐起点附近最多 3 家符合类型的真实地点。",
+      "status": "done",
+      "evidence": "SKILL.md 第 8 节普通推荐"
+    },
+    {
+      "id": "s3-2",
+      "section": "三、验收与评测",
+      "requirement": "时间限制：只推荐步行时间上限内可达的地点，超时地点不算符合条件。",
+      "status": "done",
+      "evidence": "SKILL.md 第 2 节和第 8 节时间限制"
+    },
+    {
+      "id": "s3-3",
+      "section": "三、验收与评测",
+      "requirement": "偏好排序：用户说优先更近时，顺序和解释与步行路线时间一致。",
+      "status": "done",
+      "evidence": "SKILL.md 第 2 节和第 8 节偏好排序"
+    },
+    {
+      "id": "s3-4",
+      "section": "三、验收与评测",
+      "requirement": "结果不足或查询异常：如实说明没有足够结果或服务异常，不编造地点和路线。",
+      "status": "done",
+      "evidence": "SKILL.md 第 6 节和第 8 节结果不足或查询异常"
+    }
+  ]
+}

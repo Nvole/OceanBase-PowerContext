@@ -1,0 +1,11 @@
+{
+  "skill_name": "seekdb-hybrid-lab",
+  "zip": "/data/zouyuanwei/oceanbase/tracks/06_modelscope_agent/dist/seekdb-hybrid-lab.zip",
+  "zip_bytes": 4419,
+  "token_printed": false,
+  "seekdb_contacted": false,
+  "env_file_modified": false,
+  "uploaded": false,
+  "reason": "MODELSCOPE_API_TOKEN is not set",
+  "network_called": false
+}

@@ -1,0 +1,178 @@
+command: cd /data/zouyuanwei/oceanbase && . ./env.sh && PYTHONPATH=tracks/07_minimax_engineering_context/src uv run --locked python -m unittest discover -s tracks/07_minimax_engineering_context/tests -v
+code_file: src/lab/invoice_filter.py
+code_sha256: c58d4a8a1b3327541672fe93a5dc29c48febd24ec2fa0bf8635425f0d93044f5
+revision: amount-status-only
+
+
+test_changed_hit_text_replaces_the_sentence (test_context_unit.ContextAssemblyTests.test_changed_hit_text_replaces_the_sentence) ... ok
+test_retrieval_modules_do_not_name_materials (test_context_unit.ContextAssemblyTests.test_retrieval_modules_do_not_name_materials) ... ok
+test_sources_come_from_hit_metadata (test_context_unit.ContextAssemblyTests.test_sources_come_from_hit_metadata) ... ok
+test_terms_keep_full_tokens (test_context_unit.ContextAssemblyTests.test_terms_keep_full_tokens) ... ok
+test_filter_amount_and_status (test_invoice_filter.InvoiceFilterTests.test_filter_amount_and_status) ... ok
+test_filter_by_date_range (test_invoice_filter.InvoiceFilterTests.test_filter_by_date_range) ... FAIL
+test_filter_by_max_amount (test_invoice_filter.InvoiceFilterTests.test_filter_by_max_amount) ... ok
+test_filter_by_min_amount (test_invoice_filter.InvoiceFilterTests.test_filter_by_min_amount) ... ok
+test_filter_by_status (test_invoice_filter.InvoiceFilterTests.test_filter_by_status) ... ok
+test_filter_date_accepts_date_objects (test_invoice_filter.InvoiceFilterTests.test_filter_date_accepts_date_objects) ... FAIL
+test_filter_date_end_only (test_invoice_filter.InvoiceFilterTests.test_filter_date_end_only) ... FAIL
+test_filter_date_inverted_range_is_empty (test_invoice_filter.InvoiceFilterTests.test_filter_date_inverted_range_is_empty) ... FAIL
+test_filter_date_single_day_inclusive (test_invoice_filter.InvoiceFilterTests.test_filter_date_single_day_inclusive) ... FAIL
+test_filter_date_start_only (test_invoice_filter.InvoiceFilterTests.test_filter_date_start_only) ... FAIL
+test_filter_date_uses_calendar_day (test_invoice_filter.InvoiceFilterTests.test_filter_date_uses_calendar_day) ... FAIL
+test_filter_date_with_amount_and_status (test_invoice_filter.InvoiceFilterTests.test_filter_date_with_amount_and_status) ... FAIL
+test_filter_does_not_mutate_input (test_invoice_filter.InvoiceFilterTests.test_filter_does_not_mutate_input) ... ok
+test_filter_min_amount_is_inclusive (test_invoice_filter.InvoiceFilterTests.test_filter_min_amount_is_inclusive) ... ok
+test_filter_status_is_case_sensitive (test_invoice_filter.InvoiceFilterTests.test_filter_status_is_case_sensitive) ... ok
+test_filter_without_constraints_preserves_order (test_invoice_filter.InvoiceFilterTests.test_filter_without_constraints_preserves_order) ... ok
+test_omitted_dates_do_not_filter (test_invoice_filter.InvoiceFilterTests.test_omitted_dates_do_not_filter) ... ok
+
+======================================================================
+FAIL: test_filter_by_date_range (test_invoice_filter.InvoiceFilterTests.test_filter_by_date_range)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 56, in test_filter_by_date_range
+    self.assertEqual(ids(selected), ["B", "D"])
+AssertionError: Lists differ: ['A', 'B', 'C', 'D', 'E'] != ['B', 'D']
+
+First differing element 0:
+'A'
+'B'
+
+First list contains 3 additional elements.
+First extra element 2:
+'C'
+
+- ['A', 'B', 'C', 'D', 'E']
++ ['B', 'D']
+
+======================================================================
+FAIL: test_filter_date_accepts_date_objects (test_invoice_filter.InvoiceFilterTests.test_filter_date_accepts_date_objects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 70, in test_filter_date_accepts_date_objects
+    self.assertEqual(ids(selected), ["B", "D"])
+AssertionError: Lists differ: ['A', 'B', 'C', 'D', 'E'] != ['B', 'D']
+
+First differing element 0:
+'A'
+'B'
+
+First list contains 3 additional elements.
+First extra element 2:
+'C'
+
+- ['A', 'B', 'C', 'D', 'E']
++ ['B', 'D']
+
+======================================================================
+FAIL: test_filter_date_end_only (test_invoice_filter.InvoiceFilterTests.test_filter_date_end_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 62, in test_filter_date_end_only
+    self.assertEqual(ids(filter_invoices(load(), end_date="2024-01-31")), ["A"])
+AssertionError: Lists differ: ['A', 'B', 'C', 'D', 'E'] != ['A']
+
+First list contains 4 additional elements.
+First extra element 1:
+'B'
+
+- ['A', 'B', 'C', 'D', 'E']
++ ['A']
+
+======================================================================
+FAIL: test_filter_date_inverted_range_is_empty (test_invoice_filter.InvoiceFilterTests.test_filter_date_inverted_range_is_empty)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 74, in test_filter_date_inverted_range_is_empty
+    self.assertEqual(selected, [])
+AssertionError: Lists differ: [{'id': 'A', 'amount': 10, 'status': 'open[328 chars]01'}] != []
+
+First list contains 5 additional elements.
+First extra element 0:
+{'id': 'A', 'amount': 10, 'status': 'open', 'invoice_date': '2024-01-01'}
+
++ []
+- [{'amount': 10, 'id': 'A', 'invoice_date': '2024-01-01', 'status': 'open'},
+-  {'amount': 50, 'id': 'B', 'invoice_date': '2024-02-15', 'status': 'paid'},
+-  {'amount': 80, 'id': 'C', 'invoice_date': '2024-03-20', 'status': 'open'},
+-  {'amount': 50, 'id': 'D', 'invoice_date': '2024-02-15', 'status': 'void'},
+-  {'amount': 50, 'id': 'E', 'invoice_date': '2024-03-01', 'status': 'paid'}]
+
+======================================================================
+FAIL: test_filter_date_single_day_inclusive (test_invoice_filter.InvoiceFilterTests.test_filter_date_single_day_inclusive)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 66, in test_filter_date_single_day_inclusive
+    self.assertEqual(ids(selected), ["B", "D"])
+AssertionError: Lists differ: ['A', 'B', 'C', 'D', 'E'] != ['B', 'D']
+
+First differing element 0:
+'A'
+'B'
+
+First list contains 3 additional elements.
+First extra element 2:
+'C'
+
+- ['A', 'B', 'C', 'D', 'E']
++ ['B', 'D']
+
+======================================================================
+FAIL: test_filter_date_start_only (test_invoice_filter.InvoiceFilterTests.test_filter_date_start_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 59, in test_filter_date_start_only
+    self.assertEqual(ids(filter_invoices(load(), start_date="2024-03-01")), ["C", "E"])
+AssertionError: Lists differ: ['A', 'B', 'C', 'D', 'E'] != ['C', 'E']
+
+First differing element 0:
+'A'
+'C'
+
+First list contains 3 additional elements.
+First extra element 2:
+'C'
+
+- ['A', 'B', 'C', 'D', 'E']
++ ['C', 'E']
+
+======================================================================
+FAIL: test_filter_date_uses_calendar_day (test_invoice_filter.InvoiceFilterTests.test_filter_date_uses_calendar_day)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 81, in test_filter_date_uses_calendar_day
+    self.assertEqual(ids(selected), ["B", "D", "T"])
+AssertionError: Lists differ: ['A', 'B', 'C', 'D', 'E', 'T', 'N'] != ['B', 'D', 'T']
+
+First differing element 0:
+'A'
+'B'
+
+First list contains 4 additional elements.
+First extra element 3:
+'D'
+
+- ['A', 'B', 'C', 'D', 'E', 'T', 'N']
++ ['B', 'D', 'T']
+
+======================================================================
+FAIL: test_filter_date_with_amount_and_status (test_invoice_filter.InvoiceFilterTests.test_filter_date_with_amount_and_status)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/zouyuanwei/oceanbase/tracks/07_minimax_engineering_context/tests/test_invoice_filter.py", line 86, in test_filter_date_with_amount_and_status
+    self.assertEqual(ids(selected), ["B"])
+AssertionError: Lists differ: ['B', 'E'] != ['B']
+
+First list contains 1 additional elements.
+First extra element 1:
+'E'
+
+- ['B', 'E']
++ ['B']
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.003s
+
+FAILED (failures=8)
+
+exit_code: 1

@@ -1,0 +1,8 @@
+{"id": "doc-hybrid", "title": "seekdb 混合检索", "document": "seekdb 用 hybrid_search 在数据库内完成混合检索。全文条件是 where_document 的 $contains，向量条件是 knn 的 query_embeddings，融合方式是 rank 的 rrf。不能把两路结果拿回浏览器再自行拼分。"}
+{"id": "doc-browser", "title": "浏览器本地向量", "document": "文档向量和查询向量都由浏览器里的 Transformers.js 计算。服务端只接收已经算好的向量、原文和元数据，禁止在服务端调用 embedding 模型或云端推理 API。"}
+{"id": "doc-backend", "title": "WebGPU 与 WASM", "document": "端侧推理优先选择 WebGPU。浏览器没有 WebGPU 或初始化失败时自动降级到 WASM，页面上要明确显示当前真正使用的后端。两种后端都使用 INT8 模型。"}
+{"id": "doc-int8", "title": "INT8 量化", "document": "量化方案是 INT8。Transformers.js 使用 dtype q8，实际加载 Xenova/all-MiniLM-L6-v2 的 onnx/model_quantized.onnx。该文件与 model_int8.onnx 字节相同。"}
+{"id": "doc-refresh", "title": "索引刷新", "document": "新文档写入 track02_stepfun_kb 之后必须调用 refresh_index。索引刷新完成，新增原文才应该被混合检索稳定命中。只写入不刷新不能当作已经可检索。"}
+{"id": "doc-minilm", "title": "模型与维度", "document": "开源模型是 sentence-transformers/all-MiniLM-L6-v2 的 Transformers.js 转换版 Xenova/all-MiniLM-L6-v2。向量维度 384，池化方式是 mean，并做 L2 归一化，距离使用 cosine。"}
+{"id": "doc-incremental", "title": "增量写入", "document": "增量导入继续写入同一个集合 track02_stepfun_kb。相同文档 id 使用 upsert 覆盖，不会因为重复点击而复制出多条记录。清空集合需要单独确认。"}
+{"id": "doc-session", "title": "会话状态", "document": "浏览器把 session_id 放进元数据。检索时可以只限制当前会话，从而在连续导入和切换会话后仍与所选知识库范围一致。集合名在整个应用中保持不变。"}

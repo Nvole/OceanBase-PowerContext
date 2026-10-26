@@ -1,0 +1,18 @@
+{
+  "source_url": "https://huggingface.co/api/models/Xenova/all-MiniLM-L6-v2/tree/main/onnx",
+  "fetched_during_test": false,
+  "fetch_error": "URLError",
+  "weights_downloaded": false,
+  "onnx_bytes": {
+    "onnx/model.onnx": 90387606,
+    "onnx/model_fp16.onnx": 45297825,
+    "onnx/model_quantized.onnx": 22972370,
+    "onnx/model_int8.onnx": 22972370
+  },
+  "fp32_bytes": 90387606,
+  "int8_q8_bytes": 22972370,
+  "compression_ratio_fp32_over_int8": 3.9346225922706277,
+  "same_bytes_as_model_int8": true,
+  "scope": "ONNX weight files only. Tokenizer and config are shared and are not quantized.",
+  "quality_change": "Not measured. The headless host did not run FP32 or INT8 browser inference."
+}

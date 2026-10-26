@@ -1,0 +1,8 @@
+[
+  {"query": "混合检索在数据库里怎么融合", "expect_id": "doc-hybrid"},
+  {"query": "向量是在浏览器还是服务器计算", "expect_id": "doc-browser"},
+  {"query": "没有 WebGPU 时用什么后端", "expect_id": "doc-backend"},
+  {"query": "INT8 量化加载哪个模型文件", "expect_id": "doc-int8"},
+  {"query": "写入以后怎样才能检索到新文档", "expect_id": "doc-refresh"},
+  {"query": "嵌入维度是多少", "expect_id": "doc-minilm"}
+]

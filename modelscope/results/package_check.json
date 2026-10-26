@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "skill_name": "seekdb-hybrid-lab",
+  "version": "0.1.0",
+  "description_language": "zh",
+  "zip": "/data/zouyuanwei/oceanbase/tracks/06_modelscope_agent/dist/seekdb-hybrid-lab.zip",
+  "zip_bytes": 4419,
+  "zip_under_5mb": true,
+  "skill_md_at_zip_root": true,
+  "skill_md_count": 1,
+  "zip_members": [
+    "SKILL.md",
+    "examples/hybrid_search_calls.py",
+    "examples/three_records.json"
+  ],
+  "example_records": 3,
+  "example_ids": [
+    "lab-seekdb",
+    "lab-engineering",
+    "lab-workflow"
+  ],
+  "required_steps": [
+    "upsert",
+    "refresh_index",
+    "hybrid_search"
+  ],
+  "required_paths": [
+    "query.where_document.$contains",
+    "knn.query_embeddings",
+    "rank.rrf"
+  ],
+  "example_ran_without_database": true,
+  "seekdb_contacted": false
+}

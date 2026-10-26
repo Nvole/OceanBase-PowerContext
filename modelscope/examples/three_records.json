@@ -1,0 +1,20 @@
+[
+  {
+    "id": "lab-seekdb",
+    "document": "seekdb 同时保存文档和向量，用于混合检索实验",
+    "embedding": [1.0, 0.0, 0.0],
+    "metadata": {"topic": "retrieval"}
+  },
+  {
+    "id": "lab-engineering",
+    "document": "工程笔记记录 hybrid search 的全文与向量融合",
+    "embedding": [0.9, 0.1, 0.0],
+    "metadata": {"topic": "engineering"}
+  },
+  {
+    "id": "lab-workflow",
+    "document": "工作流知识库把文档和向量检索连在一起",
+    "embedding": [0.0, 0.0, 1.0],
+    "metadata": {"topic": "workflow"}
+  }
+]

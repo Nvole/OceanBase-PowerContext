@@ -1,0 +1,90 @@
+{
+  "task": "invoice-date-range filter_invoices test_filter_by_date_range SPEC_SENTENCE 日期范围 金额 状态",
+  "queries": [
+    {
+      "term": "invoice-date-range",
+      "mode": "fulltext",
+      "ids": [
+        "tests/test_context_unit.py",
+        "docs/invoice_filter_spec.md",
+        "docs/runbook.md"
+      ]
+    },
+    {
+      "term": "filter_invoices",
+      "mode": "fulltext",
+      "ids": [
+        "tests/test_invoice_filter.py",
+        "tests/test_context_unit.py",
+        "src/lab/invoice_filter.py",
+        "docs/invoice_filter_spec.md",
+        "docs/runbook.md"
+      ]
+    },
+    {
+      "term": "test_filter_by_date_range",
+      "mode": "fulltext",
+      "ids": [
+        "docs/invoice_filter_spec.md",
+        "tests/test_invoice_filter.py",
+        "docs/runbook.md"
+      ]
+    },
+    {
+      "term": "SPEC_SENTENCE",
+      "mode": "fulltext",
+      "ids": [
+        "tests/test_context_unit.py",
+        "docs/invoice_filter_spec.md",
+        "docs/runbook.md"
+      ]
+    },
+    {
+      "term": "日期范围",
+      "mode": "fulltext",
+      "ids": [
+        "docs/invoice_filter_spec.md",
+        "tests/test_context_unit.py",
+        "docs/one_page.md",
+        "docs/runbook.md",
+        "docs/task.md"
+      ]
+    },
+    {
+      "term": "金额",
+      "mode": "fulltext",
+      "ids": [
+        "docs/invoice_filter_spec.md",
+        "docs/one_page.md",
+        "docs/runbook.md"
+      ]
+    },
+    {
+      "term": "状态",
+      "mode": "fulltext",
+      "ids": [
+        "docs/invoice_filter_spec.md",
+        "docs/one_page.md",
+        "docs/runbook.md",
+        "docs/task.md"
+      ]
+    }
+  ],
+  "sources": {
+    "spec_items": [
+      "docs/invoice_filter_spec.md"
+    ],
+    "code": [
+      "src/lab/invoice_filter.py"
+    ],
+    "tests": [
+      "tests/test_context_unit.py",
+      "tests/test_invoice_filter.py"
+    ],
+    "other": [
+      "docs/one_page.md",
+      "docs/runbook.md",
+      "docs/task.md"
+    ]
+  }
+}

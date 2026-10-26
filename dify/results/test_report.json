@@ -1,0 +1,26 @@
+{
+  "hash_vector": {
+    "passed": true
+  },
+  "host": {
+    "passed": true
+  },
+  "source": {
+    "passed": true
+  },
+  "single_hybrid_call": {
+    "passed": true
+  },
+  "refresh_after_write": {
+    "passed": true
+  },
+  "dsl": {
+    "passed": true
+  },
+  "real_hybrid": {
+    "passed": true
+  },
+  "real_save": {
+    "passed": true
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "track": "03_amap_location_agent",
+  "skill": "SKILL.md",
+  "amap_api_called": false,
+  "passed": true,
+  "checks": [
+    {
+      "id": "tool_names",
+      "label": "工具名",
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "id": "walking_route",
+      "label": "步行路线",
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "id": "max_3",
+      "label": "最多 3 家",
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "id": "unverified",
+      "label": "未核实",
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "id": "failure_handling",
+      "label": "失败处理",
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "id": "no_straight_line",
+      "label": "禁止直线距离",
+      "status": "pass",
+      "missing": []
+    },
+    {
+      "id": "checklist",
+      "label": "题面条目",
+      "status": "pass",
+      "missing": []
+    }
+  ]
+}
