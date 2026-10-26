@@ -79,7 +79,7 @@ class ContextPack:
 
     @classmethod
     def from_bytes(cls, data: bytes) -> ContextPack:
-        """Decode a canonical pack and reject any digest, size, or schema mismatch."""
+        """Decode a pack and reject any digest, canonical size, or schema mismatch."""
 
         raw = _raw_bytes(data)
         payload = _load_object(raw, _PACK_FIELDS)
@@ -93,7 +93,7 @@ class ContextPack:
         if type(byte_count) is not int or byte_count < 0:
             raise ContextPackError("pack byte_count")
         pack = cls.build(items)
-        if pack.digest != digest or pack.byte_count != byte_count or pack.to_bytes() != raw:
+        if pack.digest != digest or pack.byte_count != byte_count:
             raise ContextPackError("pack check")
         return pack
 

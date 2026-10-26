@@ -18,14 +18,19 @@ from __future__ import annotations
 
 import hashlib
 import io
+import logging
 import math
 import re
+import threading
 import unicodedata
+import zlib
 from collections.abc import Mapping, Sequence
+from copy import copy
 from dataclasses import dataclass
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
+from typing_extensions import override
 
 from powercontext.artifacts.models import MemoryCitation
 from powercontext.builtin.runtime.models import GetMemoryEntryRequest, SearchMemoryRequest
@@ -423,6 +428,7 @@ async def search_pdf_pages(memory: Any, question: str, limit: int = 10) -> tuple
         records = await _records_from_search(memory, question, limit)
     if not records:
         return ()
+    records = _question_documents(records, question)
     scores = _score_texts(tuple(record.text for record in records), question)
     ranks = await _search_ranks(memory, question, records, limit)
     order = sorted(
@@ -465,6 +471,9 @@ def _source_name(document_id: str, document_sha256: str, page_number: int) -> st
 
 
 def _extract_page_texts(content: bytes) -> tuple[str, ...]:
+    failures = _PDFExtractionFailures()
+    logger = logging.getLogger("pypdf")
+    logger.addHandler(failures)
     try:
         from pypdf import PdfReader
 
@@ -476,15 +485,134 @@ def _extract_page_texts(content: bytes) -> tuple[str, ...]:
             raise ValueError("PDF contains no pages")  # noqa: TRY003
         texts: list[str] = []
         for index in range(page_count):
-            extracted = reader.pages[index].extract_text(extraction_mode="plain")
+            page = reader.pages[index]
+            _validate_text_streams(page.get("/Contents"), page.get("/Resources", {}), reader, set(), set())
+            extracted = page.extract_text(extraction_mode="plain")
             texts.append("" if extracted is None else extracted)
-        if len(texts) != page_count:
+        if len(texts) != page_count or failures.failed:
             raise ValueError("PDF page extraction was incomplete")  # noqa: TRY003
     except ValueError:
         raise
     except Exception as error:
         raise ValueError("PDF could not be parsed completely") from error  # noqa: TRY003
+    finally:
+        logger.removeHandler(failures)
     return tuple(texts)
+
+
+class _PDFExtractionFailures(logging.Handler):
+    """Detect explicit pypdf failures that it otherwise converts into partial output."""
+
+    def __init__(self) -> None:
+        super().__init__(level=logging.WARNING)
+        self.thread_id = threading.get_ident()
+        self.failed = False
+
+    @override
+    def emit(self, record: logging.LogRecord) -> None:
+        if record.thread != self.thread_id:
+            return
+        message = record.getMessage()
+        self.failed |= (
+            record.levelno >= logging.ERROR
+            or message.startswith((
+                "Error ",
+                "Impossible to decode XFormObject ",
+                "EOF marker seems truncated",
+                "EOF marker not found",
+                "CAUTION: startxref found while searching for %%EOF.",
+                "found startxref pointing to a previous revision after a corrupt one",
+                "Invalid/Truncated xref table.",
+                "XRef object at ",
+                "Detected cyclic form XObject reference, skipping ",
+                "Exceeded ",
+                "PdfReadError(",
+                "PdfStreamError(",
+            ))
+            or (record.name == "pypdf._reader" and message.startswith("Object ") and message.endswith(" not defined."))
+        )
+
+
+def _validate_text_streams(value: Any, resources: Any, reader: Any, visited: set[int], active: set[int]) -> None:
+    """Check actual page/Form content without decoding unrelated image streams."""
+
+    from pypdf.generic import NullObject
+
+    if value is None:
+        return
+    stream = value.get_object()
+    if isinstance(stream, NullObject):
+        return
+    identity = id(stream)
+    if identity in active:
+        raise ValueError("PDF content contains a cyclic Form reference")  # noqa: TRY003
+    if identity in visited:
+        return
+    active.add(identity)
+    try:
+        _validate_called_forms(stream, resources, reader, visited, active)
+    finally:
+        active.remove(identity)
+    visited.add(identity)
+
+
+def _validate_called_forms(stream: Any, resources: Any, reader: Any, visited: set[int], active: set[int]) -> None:
+    from pypdf.generic import ContentStream
+
+    _validate_content_filters(stream)
+    content = ContentStream(stream, reader)
+    if hasattr(resources, "get_object"):
+        resources = resources.get_object()
+    for operands, operator in content.operations:
+        if operator != b"Do" or not operands:
+            continue
+        xobjects = resources.get("/XObject", {})
+        if hasattr(xobjects, "get_object"):
+            xobjects = xobjects.get_object()
+        target = xobjects.get(operands[0])
+        if target is None:
+            raise ValueError("PDF content refers to a missing XObject")  # noqa: TRY003
+        form = target.get_object()
+        if form.get("/Subtype") != "/Image":
+            _validate_text_streams(form, form.get("/Resources", resources), reader, visited, active)
+
+
+def _validate_content_filters(stream: Any) -> None:
+    """An array of content streams is one program; only its byte filters are independent."""
+
+    from pypdf.generic import ArrayObject, NullObject
+
+    resolved = stream.get_object()
+    if isinstance(resolved, ArrayObject):
+        for part in resolved:
+            _validate_content_filters(part)
+    elif not isinstance(resolved, NullObject):
+        _validate_flate_stream(resolved)
+
+
+def _validate_flate_stream(stream: Any) -> None:
+    """pypdf's recovery decoder accepts truncated DEFLATE streams; require their end marker."""
+
+    from pypdf.filters import decode_stream_data
+    from pypdf.generic import ArrayObject, NameObject
+
+    filters = stream.get("/Filter", ())
+    if hasattr(filters, "get_object"):
+        filters = filters.get_object()
+    if not isinstance(filters, (ArrayObject, tuple)):
+        filters = (filters,)
+    for index, name in enumerate(filters):
+        if name not in {"/FlateDecode", "/Fl"}:
+            continue
+        preceding = copy(stream)
+        preceding[NameObject("/Filter")] = ArrayObject(filters[:index])
+        data = decode_stream_data(preceding)
+        decoder = zlib.decompressobj()
+        decoder.decompress(data, 65536)
+        while decoder.unconsumed_tail and not decoder.eof:
+            decoder.decompress(decoder.unconsumed_tail, 65536)
+        if not decoder.eof:
+            raise ValueError("PDF content has a truncated compressed stream")  # noqa: TRY003
 
 
 def _prepare_page_text(extracted: str) -> str:
@@ -498,6 +626,73 @@ def _rewrite_question(question: str) -> str:
     for pattern, replacement in _PHRASE_REWRITES:
         rewritten = pattern.sub(replacement, rewritten)
     return rewritten
+
+
+def _question_documents(records: Sequence[_PageRecord], question: str) -> tuple[_PageRecord, ...]:
+    """Respect report names explicitly present in the question before ranking pages.
+
+    The standard projection prefixes every page with its document id. Using this
+    shared label prevents a page from another report winning only because its
+    narrative repeats more of the question's financial vocabulary.
+    """
+
+    question_words = re.findall(r"[a-z0-9]+", question.lower())
+    labels = {record.text.partition("\n")[0] for record in records}
+    matched: set[str] = set()
+    matched_names: set[str] = set()
+    for label in labels:
+        keys = _document_name_keys(label)
+        if not keys:
+            continue
+        longest = max(map(len, keys))
+        for start in range(len(question_words)):
+            phrase = ""
+            for word in question_words[start:]:
+                phrase += word
+                if phrase in keys:
+                    matched.add(label)
+                    matched_names.add(phrase)
+                    break
+                if len(phrase) >= longest:
+                    break
+            if label in matched:
+                break
+    comparison = {"compare", "compared", "comparison", "versus", "vs"}.intersection(question_words)
+    if not matched or (comparison and len(matched_names) < 2):
+        return tuple(records)
+    return tuple(record for record in records if record.text.partition("\n")[0] in matched)
+
+
+def _document_name_keys(label: str) -> set[str]:
+    report_words = {
+        "annual",
+        "financial",
+        "fiscal",
+        "form",
+        "fy",
+        "pdf",
+        "quarterly",
+        "report",
+        "statement",
+        "statements",
+        "co",
+    }
+    words = [
+        word
+        for word in re.findall(r"[a-z0-9]+", label.lower())
+        if len(word) > 1
+        and not word.isdecimal()
+        and word not in report_words
+        and re.fullmatch(r"(?:fy)?\d{2,4}|\d+[kq]", word) is None
+    ]
+    key = "".join(words)
+    if len(key) < 2 or (len(key) == 2 and key.isalpha()):
+        return set()
+    keys = {key}
+    for suffix in ("incorporated", "corporation", "company", "limited", "corp", "inc", "ltd", "llc", "plc"):
+        if key.endswith(suffix) and len(key) - len(suffix) >= 3:
+            keys.add(key[: -len(suffix)])
+    return keys
 
 
 def _focused_terms(question: str) -> list[str]:
@@ -769,6 +964,8 @@ def _record_from_entry(record: Any) -> _PageRecord | None:
     if len(sources) != 1:
         return None
     source = sources[0]
+    if getattr(source, "source_type", None) != "pdf-page":
+        return None
     source_id = getattr(source, "source_id", None)
     text = getattr(entry, "text", None)
     if not isinstance(source_id, str) or not source_id or not isinstance(text, str):

@@ -15,13 +15,17 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import io
+import logging
 import re
+import zlib
 from collections import Counter
 from pathlib import Path
 
+import pytest
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
+from pypdf.generic import ArrayObject, DecodedStreamObject, DictionaryObject, EncodedStreamObject, NameObject
 
 from powercontext.builtin.artifacts.memory import MemoryCandidateRequest, MemoryEntryInput
 from powercontext.builtin.persistence.sqlite import SQLiteConfig
@@ -96,6 +100,118 @@ def test_pdf_long_page_retains_all_tokens_and_the_final_evidence() -> None:
     )
     assert pages[0].text.endswith("Terminalevidence annual liability 987654321")
     assert pages[1].text == ""
+
+
+def _pdf_with_compressed_second_page(*, damage: str | None = None, form: bool = False) -> bytes:
+    writer = PdfWriter(clone_from=PdfReader(io.BytesIO(_dense_pdf())))
+    page = writer.pages[1]
+    resources = writer.pages[0]["/Resources"]
+    stream = EncodedStreamObject()
+    compressed = zlib.compress(b"BT /F1 12 Tf 10 100 Td (Second page evidence) Tj ET")
+    if damage == "truncated":
+        compressed = compressed[:-4]
+    elif damage == "broken":
+        compressed = b"broken compressed content"
+    stream._data = base64.a85encode(compressed, adobe=True)
+    stream[NameObject("/Filter")] = ArrayObject([NameObject("/ASCII85Decode"), NameObject("/FlateDecode")])
+    page[NameObject("/Resources")] = resources
+    if form:
+        stream[NameObject("/Type")] = NameObject("/XObject")
+        stream[NameObject("/Subtype")] = NameObject("/Form")
+        stream[NameObject("/Resources")] = resources
+        xobjects = DictionaryObject()
+        if damage != "missing-form":
+            xobjects[NameObject("/Evidence")] = writer._add_object(stream)
+        page[NameObject("/Resources")] = DictionaryObject({NameObject("/XObject"): xobjects})
+        invocation = DecodedStreamObject()
+        invocation.set_data(b"/Evidence Do")
+        page[NameObject("/Contents")] = writer._add_object(invocation)
+    else:
+        page[NameObject("/Contents")] = writer._add_object(stream)
+    buffer = io.BytesIO()
+    writer.write(buffer)
+    return buffer.getvalue()
+
+
+@pytest.mark.parametrize("form", [False, True])
+def test_pdf_compressed_page_and_form_keep_all_text(form: bool) -> None:
+    raw = _pdf_with_compressed_second_page(form=form)
+    pages = parse_pdf_document(PDFDocumentInput(document_id="compressed", content=raw))
+    assert len(pages) == 2
+    assert pages[0].text.endswith("Terminalevidence annual liability 987654321")
+    assert pages[1].text == "Second page evidence"
+
+
+@pytest.mark.parametrize("damage", ["broken", "truncated"])
+@pytest.mark.parametrize("form", [False, True])
+def test_pdf_damaged_page_or_form_fails_atomically(damage: str, form: bool) -> None:
+    raw = _pdf_with_compressed_second_page(damage=damage, form=form)
+    with pytest.raises(ValueError):
+        parse_pdf_document(PDFDocumentInput(document_id="damaged", content=raw))
+
+
+def test_pdf_missing_called_form_fails_atomically() -> None:
+    raw = _pdf_with_compressed_second_page(damage="missing-form", form=True)
+    with pytest.raises(ValueError):
+        parse_pdf_document(PDFDocumentInput(document_id="missing-form", content=raw))
+
+
+def test_pdf_contents_array_is_one_program_across_stream_boundaries() -> None:
+    writer = PdfWriter(clone_from=PdfReader(io.BytesIO(_dense_pdf())))
+    page = writer.pages[1]
+    page[NameObject("/Resources")] = writer.pages[0]["/Resources"]
+    parts = ArrayObject()
+    for content in (b"BT /F1 12 Tf 20 100 Td (Hello", b"text 12345) Tj ET"):
+        stream = DecodedStreamObject()
+        stream.set_data(content)
+        parts.append(writer._add_object(stream.flate_encode()))
+    page[NameObject("/Contents")] = parts
+    buffer = io.BytesIO()
+    writer.write(buffer)
+    raw = buffer.getvalue()
+    expected = PdfReader(io.BytesIO(raw)).pages[1].extract_text()
+    pages = parse_pdf_document(PDFDocumentInput(document_id="content-array", content=raw))
+    assert len(pages) == 2
+    assert pages[1].text == " ".join(expected.split()) == "Hello text 12345"
+
+
+def _pdf_with_form_calls(*, cyclic: bool) -> bytes:
+    writer = PdfWriter(clone_from=PdfReader(io.BytesIO(_dense_pdf())))
+    page = writer.pages[1]
+    resources = writer.pages[0]["/Resources"]
+    assert isinstance(resources, DictionaryObject)
+    form = DecodedStreamObject()
+    form.set_data(b"BT /F1 12 Tf 10 100 Td (Repeated evidence) Tj ET" + (b" /Self Do" if cyclic else b""))
+    form[NameObject("/Subtype")] = NameObject("/Form")
+    form_resources = DictionaryObject({NameObject("/Font"): resources["/Font"]})
+    form[NameObject("/Resources")] = form_resources
+    reference = writer._add_object(form)
+    if cyclic:
+        form_resources[NameObject("/XObject")] = DictionaryObject({NameObject("/Self"): reference})
+    page[NameObject("/Resources")] = DictionaryObject({
+        NameObject("/XObject"): DictionaryObject({NameObject("/Evidence"): reference}),
+    })
+    invocation = DecodedStreamObject()
+    invocation.set_data(b"/Evidence Do" if cyclic else b"/Evidence Do /Evidence Do")
+    page[NameObject("/Contents")] = writer._add_object(invocation)
+    buffer = io.BytesIO()
+    writer.write(buffer)
+    return buffer.getvalue()
+
+
+def test_pdf_repeated_form_calls_preserve_each_call() -> None:
+    pages = parse_pdf_document(
+        PDFDocumentInput(document_id="repeated-form", content=_pdf_with_form_calls(cyclic=False))
+    )
+    assert len(pages) == 2
+    assert pages[1].text == "Repeated evidence Repeated evidence"
+
+
+@pytest.mark.parametrize("level", [logging.WARNING, logging.ERROR])
+def test_pdf_cyclic_form_fails_even_when_warnings_are_silent(caplog: pytest.LogCaptureFixture, level: int) -> None:
+    raw = _pdf_with_form_calls(cyclic=True)
+    with caplog.at_level(level, logger="pypdf"), pytest.raises(ValueError):
+        parse_pdf_document(PDFDocumentInput(document_id="cyclic-form", content=raw))
 
 
 def test_pdf_long_page_persists_and_retrieves_exact_evidence_after_restart(tmp_path: Path) -> None:
