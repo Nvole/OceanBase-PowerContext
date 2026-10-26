@@ -993,6 +993,15 @@ class ScopedContextApplication:
                 round_zero=round_zero,
             )
         code = await self._code_candidates(request) if request.include_code else ()
+        if request.assembly is None and not request.evidence_selection:
+            stable_candidates, stable = await self._chronological_memory_candidates(memory_candidates)
+            if stable:
+                memory_candidates = stable_candidates
+                builder.memory_candidate_limit = max(
+                    builder.memory_candidate_limit,
+                    sum(len(group.hits) for group in memory_candidates),
+                )
+                builder.prefer_stable_prefix = True
         with self._runtime._stage(
             "context.build",
             attributes={
@@ -1045,6 +1054,54 @@ class ScopedContextApplication:
                         "powercontext.context.build.recall.dropped_items": recall_effort.dropped_items,
                     })
         return build, recall_effort
+
+    async def _chronological_memory_candidates(
+        self,
+        groups: Sequence[PreparedMemoryCandidates],
+    ) -> tuple[list[PreparedMemoryCandidates], bool]:
+        """Replace search hits with every active entry, oldest revision first.
+
+        Query rank reshuffles the rendered prefix. Incremental prepare can only reuse a byte
+        prefix, so the default path keeps insertion order and leaves query changes at the tail.
+        """
+
+        rewritten: list[PreparedMemoryCandidates] = []
+        replaced = False
+        for group in groups:
+            try:
+                hits = await self._chronological_hits(group.scope_id)
+            except Exception:
+                hits = ()
+            if hits:
+                rewritten.append(
+                    PreparedMemoryCandidates(scope_id=group.scope_id, memory_ref=group.memory_ref, hits=hits)
+                )
+                replaced = True
+            else:
+                rewritten.append(group)
+        return rewritten, replaced
+
+    async def _chronological_hits(self, scope_id: str) -> tuple[MemoryHit, ...]:
+        if not scope_id:
+            return ()
+        page = await self._runtime.memory.for_scope(scope_id).list()
+        records = [
+            record
+            for record in page.entries
+            if record.state == "active" and record.entry.text.strip()
+        ]
+        records.sort(key=lambda record: (record.entry.created_in_revision, record.entry.entry_id))
+        return tuple(
+            MemoryHit(
+                memory_ref=record.memory_ref,
+                entry_id=record.entry.entry_id,
+                entry_version_id=record.entry.entry_version_id,
+                text=record.entry.text,
+                score=0.0,
+                matched_by=(),
+            )
+            for record in records
+        )
 
     async def _code_candidates(self, request: PrepareContextRequest) -> tuple[PreparedCodeCandidate, ...]:
         try:

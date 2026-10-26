@@ -168,6 +168,9 @@ class PreparedContextBuilder:
     topic_memory_entry_limit = 8
     experience_entry_limit = 2
     max_entry_content_bytes = 2000
+    # Runtime turns this on for the default prepare path. Rank order stays in place for
+    # assembly, evidence selection, and direct builder calls.
+    prefer_stable_prefix = False
     _text_entry_limit: int | None = None
 
     def empty(self) -> PreparedContext:
@@ -447,10 +450,73 @@ class PreparedContextBuilder:
                 for candidates in experience_candidates
             )
         )[: self.experience_entry_limit]
+        if self.prefer_stable_prefix and not topic_memory_entries and not experience_entries:
+            return self._select_stable_memory(request, memory_entries)
         entries, omissions = self._fit_entries(request, memory_entries, topic_memory_entries, experience_entries)
         if not entries:
             return None, (), omissions
         return _render(entries), tuple(entry.origin for entry in entries), omissions
+
+    def _select_stable_memory(
+        self,
+        request: PrepareContextRequest,
+        memory_entries: Sequence[_PreparedContextEntry],
+    ) -> tuple[str | None, tuple[PreparedContextOrigin, ...], PreparedContextOmissions]:
+        """Render chronological memory, and keep the query in a short trailing suffix.
+
+        Hits arrive oldest-first. The rendered body therefore stays put when a later call only
+        changes the query, and an appended turn changes the tail rather than the prefix.
+        """
+
+        ordered = tuple(memory_entries)
+        if not ordered:
+            return None, (), PreparedContextOmissions()
+        suffix = f"\n{request.query.strip()}"
+        suffix_bytes = len(suffix.encode("utf-8"))
+        if suffix_bytes <= 0 or suffix_bytes >= request.max_bytes // 2:
+            suffix = ""
+            suffix_bytes = 0
+        body_budget = request.max_bytes - suffix_bytes
+        newest = ordered[-1]
+        older = ordered[:-1][: max(self.entry_limit - 1, 0)]
+        newest_reserve = min(self.max_entry_content_bytes + 480, max(body_budget // 4, 0))
+        older_budget = body_budget - newest_reserve
+        if older and older_budget >= 512:
+            fitted, omissions = self._fit_entries(
+                request.model_copy(update={"max_bytes": older_budget}),
+                older,
+                (),
+                (),
+            )
+        else:
+            fitted, omissions = (), PreparedContextOmissions()
+        entries = list(fitted)
+        if len(entries) < self.entry_limit:
+            added = self._fit_entry(
+                entries,
+                origin=newest.origin,
+                kind=newest.kind,
+                citation=newest.citation,
+                text=newest.content,
+                max_bytes=body_budget,
+            )
+            if added.entry is not None:
+                entries.append(added.entry)
+            else:
+                omissions = PreparedContextOmissions(
+                    truncated_items=omissions.truncated_items,
+                    dropped_items=omissions.dropped_items + 1,
+                    dropped_below_min_bytes=omissions.dropped_below_min_bytes + int(added.dropped_below_min_bytes),
+                    dropped_no_fitting_truncation=(
+                        omissions.dropped_no_fitting_truncation + int(added.dropped_no_fitting_truncation)
+                    ),
+                )
+        if not entries:
+            return None, (), omissions
+        rendered = _render(tuple(entries))
+        if suffix and len((rendered + suffix).encode("utf-8")) <= request.max_bytes:
+            rendered += suffix
+        return rendered, tuple(entry.origin for entry in entries), omissions
 
     def _select_text(
         self,

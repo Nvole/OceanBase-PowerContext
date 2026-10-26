@@ -584,7 +584,7 @@ def _score_texts(texts: Sequence[str], question: str) -> list[float]:
     present = set(document_frequency)
     scores: list[float] = []
     query_term_set = set(terms)
-    for tokens, counts, length in zip(documents, frequencies, lengths, strict=True):
+    for text, tokens, counts, length in zip(texts, documents, frequencies, lengths, strict=True):
         lexical = 0.0
         for token, weight in weights.items():
             frequency = counts.get(token, 0)
@@ -594,7 +594,11 @@ def _score_texts(texts: Sequence[str], question: str) -> list[float]:
             denominator = frequency + _BM25_K1 * (1.0 - _BM25_B + _BM25_B * length / average_length)
             lexical += weight * inverse * frequency * (_BM25_K1 + 1.0) / denominator
         coverage = sum(inverse_document_frequency[token] for token in terms if token in counts)
-        adjustment = _bigram_bonus(counts, terms, inverse_document_frequency) + _title_bonus(tokens, query_term_set)
+        adjustment = (
+            _bigram_bonus(counts, terms, inverse_document_frequency)
+            + _title_bonus(tokens, query_term_set)
+            + _concept_bonus(text, query_term_set)
+        )
         scores.append(lexical + 0.15 * coverage + adjustment)
     return scores
 
@@ -657,6 +661,68 @@ def _section_bonus(tokens: set[str], query_terms: set[str]) -> float:
         bonus += 1.6
     if wants_geography and tokens & {"geographic", "geographical", "geography"}:
         bonus += 1.6
+    return bonus
+
+
+def _concept_bonus(text: str, query_terms: set[str]) -> float:
+    """Lift the financial statement or disclosure that a question is actually about.
+
+    Lexical overlap ranks the narrative that repeats the question words. Quick-ratio, tax-rate,
+    and segment-revenue questions are answered from a statement page that barely shares those words.
+    """
+
+    lowered = text.lower()
+    tokens = _TOKEN.findall(lowered)
+    if not tokens:
+        return 0.0
+    # Years are everywhere in a 10-K. Other numbers mark a statement or a quantified disclosure.
+    number_count = sum(1 for token in tokens if token.isdigit() and len(token) != 4)
+    density = number_count / len(tokens)
+    bonus = 0.0
+    consolidated = "consolidated" in lowered
+    balance_sheet = "balance sheet" in lowered
+    operations = any(
+        phrase in lowered
+        for phrase in (
+            "statements of operations",
+            "statement of operations",
+            "statements of income",
+            "statement of income",
+            "statements of earnings",
+            "statement of earnings",
+        )
+    )
+    wants_balance = bool(query_terms & {"quick", "liquidity", "balance", "liability", "liabilities", "asset", "assets"})
+    if wants_balance and consolidated and balance_sheet:
+        bonus += 12.0 + 45.0 * density
+    wants_results = bool(query_terms & {"tax", "taxes", "ebitda", "margin", "restructuring"})
+    if wants_results and consolidated and operations:
+        bonus += 10.0 + 35.0 * density
+    asks_categories = bool(query_terms & {"product", "products", "service", "services", "category", "categories"})
+    if asks_categories and "segment" in lowered and ("revenue" in lowered or "revenues" in lowered):
+        bonus += 8.0 + 25.0 * density
+    if (
+        {"product", "products"} & query_terms
+        and {"service", "services"} & query_terms
+        and "item 1" in lowered
+        and "business" in lowered
+    ):
+        bonus += 6.0
+    asks_customers = "customer" in query_terms or "customers" in query_terms
+    if asks_customers and "customer" in lowered and ("accounted for" in lowered or "percent of" in lowered):
+        bonus += 6.0
+    if "tax" in query_terms and "effective tax" in lowered:
+        bonus += 8.0
+    if query_terms & {"revenue", "revenues"} and "net revenue" in lowered:
+        bonus += 3.5
+    if query_terms & {"margin", "operating"} and "operating income" in lowered:
+        bonus += 4.0
+    if ("retain" in query_terms or "retention" in query_terms) and "retention" in lowered:
+        bonus += 6.0
+    if query_terms & {"geography", "geographies", "geographic", "geographical"} and any(
+        region in lowered for region in ("africa", "asia pacific", "europe", "latin america")
+    ):
+        bonus += 4.0
     return bonus
 
 
