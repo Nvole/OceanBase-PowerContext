@@ -324,6 +324,8 @@ TopicMemoryBrowse = Callable[..., Awaitable[tuple[TopicMemoryCurrentItem, ...]]]
 TopicMemoryFlush = Callable[[str], Awaitable[bool]]
 TopicMemorySearchObserver = Callable[[str, bool], None]
 
+from powercontext.builtin.runtime.source_lifecycle import LifecycleTopicSearch, SourceLifecycleApplication
+
 logger = logging.getLogger(__name__)
 
 # Leave room for database reads and assembly within the default one-second Hook request.
@@ -3110,6 +3112,7 @@ class BuiltinRuntime:
         self.work = WorkApplication(self)
         self.memory = MemoryApplication(self)
         self.topic_memory = TopicMemoryApplication(self)
+        self.lifecycle = SourceLifecycleApplication(self)
         self.records = RecordApplication(self)
         self.prompts = PromptApplication(self)
         self.review = ReviewApplication(self)
@@ -3122,6 +3125,8 @@ class BuiltinRuntime:
         self.experience_processor = (
             None if scope_ids is None or experience_incubator is None else ScheduledExperienceProcessor(self, scope_ids)
         )
+        if self._topic_memory_search is not None and not isinstance(self._topic_memory_search, LifecycleTopicSearch):
+            self._topic_memory_search = LifecycleTopicSearch(self, self._topic_memory_search)
 
     async def __aenter__(self) -> BuiltinRuntime:
         return self

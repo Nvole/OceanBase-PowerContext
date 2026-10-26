@@ -40,6 +40,7 @@ from powercontext.builtin.runtime.prepared_text import (
     fit_context_text_item,
     render_context_text,
 )
+from powercontext.builtin.runtime.evidence_selection import evidence_candidates
 from powercontext.builtin.runtime.recall_sufficiency import RecallBudgetView
 
 _MIN_TRUNCATED_CONTENT_BYTES = 64
@@ -106,6 +107,7 @@ class PreparedContextBuild:
     origins: tuple[PreparedContextOrigin, ...]
     omissions: PreparedContextOmissions = PreparedContextOmissions()
     code_origins: tuple[CodeEvidenceRef, ...] = ()
+    fragments: tuple[PreparedEvidenceFragment, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -115,6 +117,16 @@ class MemoryEntryAddress:
     memory: ArtifactAddress
     entry_id: str
     entry_version_id: str
+
+
+@dataclass(frozen=True)
+class PreparedEvidenceFragment:
+    """One exact slice of a Memory entry. ``text`` is ``entry.text[start:end]``."""
+
+    address: MemoryEntryAddress
+    start: int
+    end: int
+    text: str
 
 
 PreparedContextOrigin = MemoryCitation | ArtifactRef | MemoryEntryAddress | ArtifactAddress
@@ -211,7 +223,7 @@ class PreparedContextBuilder:
         profile_candidates: Sequence[PreparedProfileCandidate] = (),
         code_candidates: Sequence[PreparedCodeCandidate] = (),
     ) -> PreparedContextBuild:
-        if request.include_code:
+        if request.include_code and not request.evidence_selection:
 
             def historical(history_request: PrepareContextRequest, entries: int) -> PreparedContextBuild:
                 builder = PreparedContextBuilder()
@@ -234,6 +246,9 @@ class PreparedContextBuilder:
             raise PreparedContextInvariantError("topic-memory-candidate-limit")
         if sum(len(candidates.hits) for candidates in experience_candidates) > self.experience_candidate_limit:
             raise PreparedContextInvariantError("experience-candidate-limit")
+
+        if request.evidence_selection:
+            return self._build_evidence_selection(request=request, memory_candidates=memory_candidates)
 
         content, origins, omissions = self._select_entries(
             request=request,
@@ -277,6 +292,17 @@ class PreparedContextBuilder:
         counters because both go through :meth:`_select_entries`.
         """
 
+        if request.evidence_selection:
+            built = self._build_evidence_selection(request=request, memory_candidates=memory_candidates)
+            content_bytes = built.context.content_bytes
+            return RecallBudgetView(
+                max_bytes=request.max_bytes,
+                delivered_items=len(built.origins),
+                truncated_items=built.omissions.truncated_items,
+                dropped_items=built.omissions.dropped_items,
+                unused_bytes=max(0, request.max_bytes - content_bytes),
+            )
+
         content, origins, omissions = self._select_entries(
             request=request,
             current_scope_id=current_scope_id,
@@ -292,6 +318,85 @@ class PreparedContextBuilder:
             truncated_items=omissions.truncated_items,
             dropped_items=omissions.dropped_items,
             unused_bytes=max(0, request.max_bytes - content_bytes),
+        )
+
+    def _build_evidence_selection(
+        self,
+        *,
+        request: PrepareContextRequest,
+        memory_candidates: Sequence[PreparedMemoryCandidates],
+    ) -> PreparedContextBuild:
+        """Select exact memory slices for ``request.query`` inside ``request.max_bytes``.
+
+        Only Memory candidates are packed. The rendered envelope is the same untrusted-history
+        document as ordinary prepare, with citation, text, and character offsets in each item.
+        """
+
+        sources = _evidence_sources(memory_candidates)
+        if not sources:
+            return PreparedContextBuild(context=self.empty(), origins=(), omissions=PreparedContextOmissions())
+        grouped = evidence_candidates(request.query, tuple(source.text for source in sources))
+        flat: list[tuple[float, float, int, int, int]] = []
+        for index, source in enumerate(sources):
+            for candidate in grouped[index]:
+                if candidate.score <= 0 or candidate.start >= candidate.end:
+                    continue
+                flat.append((candidate.score, source.retrieval_score, index, candidate.start, candidate.end))
+        if not flat:
+            return PreparedContextBuild(context=self.empty(), origins=(), omissions=PreparedContextOmissions())
+
+        by_score = sorted(flat, key=lambda item: (-item[0], -item[1], item[2], item[3]))
+        by_density = sorted(
+            flat,
+            key=lambda item: (-item[0] / max(1, item[4] - item[3]), -item[1], item[2], item[3]),
+        )
+        best_choice: list[list[tuple[int, int, float]]] | None = None
+        best_key = (-1.0, -1)
+        for order in (by_score, by_density):
+            choice: list[list[tuple[int, int, float]]] = [[] for _ in sources]
+            for score, _retrieval, index, start, end in order:
+                trial = _integrate_span(choice, index, start, end, score)
+                if trial is None:
+                    continue
+                fragments = _materialize_evidence(sources, trial)
+                if fragments and _evidence_utf8_len(fragments) <= request.max_bytes:
+                    choice = trial
+            value = sum(score for spans in choice for _start, _end, score in spans)
+            covered = sum(end - start for spans in choice for start, end, _score in spans)
+            key = (value, covered)
+            if key > best_key:
+                best_key = key
+                best_choice = choice
+
+        choice = best_choice or [[] for _ in sources]
+        fragments = _materialize_evidence(sources, choice)
+        fragments = _shrink_evidence(sources, choice, fragments, request.max_bytes)
+        if not fragments:
+            fragments = _prefix_evidence(sources, flat, request.max_bytes)
+        if not fragments:
+            dropped = len(flat)
+            return PreparedContextBuild(
+                context=self.empty(),
+                origins=(),
+                omissions=PreparedContextOmissions(
+                    dropped_items=dropped,
+                    dropped_no_fitting_truncation=dropped,
+                ),
+            )
+        content = _render_evidence(fragments)
+        content_bytes = len(content.encode("utf-8"))
+        if content_bytes > request.max_bytes:
+            raise PreparedContextInvariantError("output-budget")
+        kept = sum(len(spans) for spans in choice) if fragments else 0
+        dropped = max(0, len(flat) - kept)
+        return PreparedContextBuild(
+            context=PreparedContext(status="ready", content=content, content_bytes=content_bytes),
+            origins=tuple(fragment.address for fragment in fragments),
+            omissions=PreparedContextOmissions(
+                dropped_items=dropped,
+                dropped_no_fitting_truncation=dropped,
+            ),
+            fragments=tuple(fragments),
         )
 
     def _select_entries(
@@ -658,6 +763,257 @@ class PreparedContextBuilder:
         if best is None:
             return _EntryFit(dropped_no_fitting_truncation=True)
         return _EntryFit(entry=best)
+
+
+@dataclass(frozen=True)
+class _EvidenceSource:
+    address: MemoryEntryAddress
+    text: str
+    retrieval_score: float
+
+
+def _evidence_sources(memory_candidates: Sequence[PreparedMemoryCandidates]) -> tuple[_EvidenceSource, ...]:
+    sources: list[_EvidenceSource] = []
+    for candidates in memory_candidates:
+        if candidates.hits and candidates.memory_ref is None:
+            raise PreparedContextInvariantError("memory-ref-missing")
+        seen: set[tuple[str, str]] = set()
+        for hit in candidates.hits:
+            if hit.memory_ref != candidates.memory_ref:
+                raise PreparedContextInvariantError("memory-ref-mismatch")
+            identity = (hit.entry_id, hit.entry_version_id)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            if not hit.entry_id.strip() or not hit.entry_version_id.strip() or not hit.text.strip():
+                continue
+            sources.append(
+                _EvidenceSource(
+                    address=MemoryEntryAddress(
+                        memory=ArtifactAddress(scope_id=candidates.scope_id, artifact=hit.memory_ref),
+                        entry_id=hit.entry_id,
+                        entry_version_id=hit.entry_version_id,
+                    ),
+                    text=hit.text,
+                    retrieval_score=float(hit.score),
+                )
+            )
+    return tuple(sources)
+
+
+def _integrate_span(
+    choice: Sequence[Sequence[tuple[int, int, float]]],
+    index: int,
+    start: int,
+    end: int,
+    score: float,
+) -> list[list[tuple[int, int, float]]] | None:
+    current = list(choice[index])
+    covered: list[int] = []
+    for slot, (old_start, old_end, _score) in enumerate(current):
+        if old_start <= start and end <= old_end:
+            return None
+        if start <= old_start and old_end <= end:
+            covered.append(slot)
+    trial = [list(spans) for spans in choice]
+    trial[index] = [span for slot, span in enumerate(current) if slot not in covered]
+    trial[index].append((start, end, score))
+    return trial
+
+
+def _coalesce_spans(text: str, spans: Sequence[tuple[int, int]]) -> list[tuple[int, int]]:
+    if not spans:
+        return []
+    ordered = sorted(spans)
+    merged: list[tuple[int, int]] = [ordered[0]]
+    for start, end in ordered[1:]:
+        prev_start, prev_end = merged[-1]
+        if start <= prev_end or not text[prev_end:start].strip():
+            merged[-1] = (prev_start, max(prev_end, end))
+        else:
+            merged.append((start, end))
+    extended: list[tuple[int, int]] = []
+    for slot, (start, end) in enumerate(merged):
+        limit = merged[slot + 1][0] if slot + 1 < len(merged) else len(text)
+        while end < limit and text[end].isspace():
+            end += 1
+        if start < end:
+            extended.append((int(start), int(end)))
+    return extended
+
+
+def _fragments_for(
+    sources: Sequence[_EvidenceSource],
+    spans_per_source: Sequence[Sequence[tuple[int, int]]],
+) -> list[PreparedEvidenceFragment]:
+    fragments: list[PreparedEvidenceFragment] = []
+    for source, spans in zip(sources, spans_per_source, strict=True):
+        for start, end in spans:
+            if not (0 <= start < end <= len(source.text)):
+                continue
+            snippet = source.text[start:end]
+            if not snippet.strip():
+                continue
+            fragments.append(
+                PreparedEvidenceFragment(
+                    address=source.address,
+                    start=int(start),
+                    end=int(end),
+                    text=snippet,
+                )
+            )
+    return fragments
+
+
+def _geometry(
+    sources: Sequence[_EvidenceSource],
+    choice: Sequence[Sequence[tuple[int, int, float]]],
+) -> list[list[tuple[int, int]]]:
+    spans_per_source = [
+        _coalesce_spans(source.text, [(start, end) for start, end, _score in spans])
+        for source, spans in zip(sources, choice, strict=True)
+    ]
+    return _bridge_spans(sources, spans_per_source)
+
+
+def _bridge_spans(
+    sources: Sequence[_EvidenceSource],
+    spans_per_source: Sequence[Sequence[tuple[int, int]]],
+) -> list[list[tuple[int, int]]]:
+    """Join nearby slices when one citation is cheaper than the text between them."""
+
+    current = [list(spans) for spans in spans_per_source]
+    while True:
+        base = _evidence_utf8_len(_fragments_for(sources, current))
+        best: list[list[tuple[int, int]]] | None = None
+        best_len = base
+        for index, spans in enumerate(current):
+            if len(spans) < 2:
+                continue
+            for slot in range(len(spans) - 1):
+                trial = [list(item) for item in current]
+                left = trial[index]
+                trial[index] = left[:slot] + [(left[slot][0], left[slot + 1][1])] + left[slot + 2 :]
+                size = _evidence_utf8_len(_fragments_for(sources, trial))
+                if size < best_len:
+                    best_len = size
+                    best = trial
+        if best is None:
+            return current
+        current = best
+
+
+def _materialize_evidence(
+    sources: Sequence[_EvidenceSource],
+    choice: Sequence[Sequence[tuple[int, int, float]]],
+) -> list[PreparedEvidenceFragment]:
+    return _fragments_for(sources, _geometry(sources, choice))
+
+
+def _shrink_evidence(
+    sources: Sequence[_EvidenceSource],
+    choice: Sequence[Sequence[tuple[int, int, float]]],
+    fragments: list[PreparedEvidenceFragment],
+    max_bytes: int,
+) -> list[PreparedEvidenceFragment]:
+    scored = [
+        (
+            sum(
+                score
+                for start, end, score in choice[index]
+                if start < fragment.end and end > fragment.start and sources[index].address == fragment.address
+            ),
+            fragment,
+        )
+        for index, _source in enumerate(sources)
+        for fragment in fragments
+        if fragment.address == sources[index].address
+    ]
+    # ``scored`` may repeat a fragment once per source; keep the first sighting.
+    unique: list[tuple[float, PreparedEvidenceFragment]] = []
+    seen: set[tuple[str, str, str, int, int]] = set()
+    for score, fragment in scored:
+        key = (
+            fragment.address.memory.scope_id,
+            fragment.address.entry_id,
+            fragment.address.entry_version_id,
+            fragment.start,
+            fragment.end,
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append((score, fragment))
+    kept = unique
+    while kept and _evidence_utf8_len([fragment for _score, fragment in kept]) > max_bytes:
+        drop = min(range(len(kept)), key=lambda slot: (kept[slot][0], kept[slot][1].end - kept[slot][1].start))
+        del kept[drop]
+    return [fragment for _score, fragment in kept]
+
+
+def _prefix_evidence(
+    sources: Sequence[_EvidenceSource],
+    flat: Sequence[tuple[float, float, int, int, int]],
+    max_bytes: int,
+) -> list[PreparedEvidenceFragment]:
+    if not flat:
+        return []
+    _score, _retrieval, index, start, end = max(flat, key=lambda item: (item[0], -item[2], -item[3]))
+    source = sources[index]
+    lower = start + 1
+    upper = end
+    best_end: int | None = None
+    while lower <= upper:
+        middle = (lower + upper) // 2
+        snippet = source.text[start:middle]
+        fragment = PreparedEvidenceFragment(
+            address=source.address,
+            start=int(start),
+            end=int(middle),
+            text=snippet,
+        )
+        if snippet.strip() and _evidence_utf8_len([fragment]) <= max_bytes:
+            best_end = middle
+            lower = middle + 1
+        else:
+            upper = middle - 1
+    if best_end is None:
+        return []
+    return [
+        PreparedEvidenceFragment(
+            address=source.address,
+            start=int(start),
+            end=int(best_end),
+            text=source.text[start:best_end],
+        )
+    ]
+
+
+def _render_evidence(fragments: Sequence[PreparedEvidenceFragment]) -> str:
+    items: list[dict[str, object]] = []
+    for fragment in fragments:
+        memory = fragment.address.memory
+        items.append(
+            {
+                "citation": {
+                    "scope_id": memory.scope_id,
+                    "memory_ref": memory.artifact.model_dump(mode="json"),
+                    "entry_id": fragment.address.entry_id,
+                    "entry_version_id": fragment.address.entry_version_id,
+                },
+                "content": fragment.text,
+                "start": fragment.start,
+                "end": fragment.end,
+            }
+        )
+    encoded = json.dumps({"trust": "untrusted_history", "items": items}, ensure_ascii=False, separators=(",", ":"))
+    return "\n\n".join((TRUST_POLICY, f"{_BEGIN_MARKER}\n{encoded}\n{_END_MARKER}"))
+
+
+def _evidence_utf8_len(fragments: Sequence[PreparedEvidenceFragment]) -> int:
+    if not fragments:
+        return 0
+    return len(_render_evidence(fragments).encode("utf-8"))
 
 
 def _interleave(
