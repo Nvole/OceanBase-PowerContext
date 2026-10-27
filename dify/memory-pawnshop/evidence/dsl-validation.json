@@ -1,0 +1,320 @@
+{
+  "generated_at": "2026-10-27T19:00:48.481432+00:00",
+  "dsl_path": "C:\\Users\\xujin\\Documents\\Codex\\2026-10-27\\just-for-fun-dify-90-5\\outputs\\memory-pawnshop\\dify\\Memory_Pawnshop_Chatflow.yml",
+  "dsl_sha256": "6daa36064c54225df6cfbc368078ce5ae58d7c57701742bde0ef91da495a6510",
+  "dify_target": "Dify 1.9.x / DSL 0.3.1",
+  "checks": [
+    {
+      "name": "DSL 版本为 0.3.1",
+      "passed": true,
+      "detail": "0.3.1"
+    },
+    {
+      "name": "应用类型为 advanced-chat",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "节点集合完整",
+      "passed": true,
+      "detail": "['answer', 'http_context', 'http_save', 'identify_ticket', 'llm', 'parse_context', 'parse_save', 'start']"
+    },
+    {
+      "name": "Chatflow Start 不依赖自定义变量",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "边引用有效节点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "边引用有效节点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "边引用有效节点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "边引用有效节点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "边引用有效节点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "边引用有效节点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "边引用有效节点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "start 只有一个出口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "identify_ticket 只有一个入口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "identify_ticket 只有一个出口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_context 只有一个入口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_context 只有一个出口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "parse_context 只有一个入口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "parse_context 只有一个出口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "llm 只有一个入口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "llm 只有一个出口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_save 只有一个入口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_save 只有一个出口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "parse_save 只有一个入口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "parse_save 只有一个出口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "answer 只有一个入口",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "identify_ticket 使用合法系统变量",
+      "passed": true,
+      "detail": "query"
+    },
+    {
+      "name": "identify_ticket 使用合法系统变量",
+      "passed": true,
+      "detail": "user_id"
+    },
+    {
+      "name": "identify_ticket 使用合法系统变量",
+      "passed": true,
+      "detail": "conversation_id"
+    },
+    {
+      "name": "parse_context 引用已有节点",
+      "passed": true,
+      "detail": "http_context"
+    },
+    {
+      "name": "parse_save 引用已有节点",
+      "passed": true,
+      "detail": "http_save"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "llm.text"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_save.receipt"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_context.ticket_line"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_context.shop_mood"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_context.customer_hint"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_context.ticket_no"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_context.visit_no"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_context.visit_no"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "parse_context.memory_block"
+    },
+    {
+      "name": "模板变量引用已有节点或 sys",
+      "passed": true,
+      "detail": "sys.query"
+    },
+    {
+      "name": "http_context 使用 POST",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_context 请求 JSON",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_context JSON body 为 Dify 1.9 单条目",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_context JSON body 可解析",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_context timeout 使用 1.9 字段",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_save 使用 POST",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_save 请求 JSON",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_save JSON body 为 Dify 1.9 单条目",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_save JSON body 可解析",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "http_save timeout 使用 1.9 字段",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "HTTP 节点使用可替换的服务地址",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "LLM 模型可导入后重新绑定",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "解析显式当票号",
+      "passed": true,
+      "detail": "当票号：小满。我想当掉一段记忆。"
+    },
+    {
+      "name": "标记显式当票来源",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "解析显式当票号",
+      "passed": true,
+      "detail": "取一个当票号叫「阿蛮」。我想典当。"
+    },
+    {
+      "name": "标记显式当票来源",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "解析显式当票号",
+      "passed": true,
+      "detail": "我的当票号是阿满，我想赎回。"
+    },
+    {
+      "name": "标记显式当票来源",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "相同 Dify 用户生成稳定当票号",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "自动当票号带可读前缀",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "拒绝把网址当作当票号",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "当票号长度限制为 24",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "result": "passed",
+  "note": "本脚本验证 DSL 结构与内嵌 Python 代码；Dify UI 实机导入需在 Dify 环境中完成。"
+}

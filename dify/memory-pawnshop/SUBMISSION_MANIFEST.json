@@ -1,0 +1,158 @@
+﻿{
+    "generated_at":  "2026-10-28T03:19:49.9770614+08:00",
+    "source":  "C:\\Users\\xujin\\Documents\\Codex\\2026-10-27\\just-for-fun-dify-90-5\\outputs\\memory-pawnshop",
+    "dsl_sha256":  "6daa36064c54225df6cfbc368078ce5ae58d7c57701742bde0ef91da495a6510",
+    "file_count":  30,
+    "files":  [
+                  {
+                      "path":  ".gitignore",
+                      "bytes":  48,
+                      "sha256":  "3ef7ff28b0b06aaafcc6dc260c3410c4ff8912299a0243220953511f33596a3d"
+                  },
+                  {
+                      "path":  "backend\\.env.example",
+                      "bytes":  643,
+                      "sha256":  "cf52d271963d713a00470e8bc4a2b283b65150cf9b8de83023260ce012b8853b"
+                  },
+                  {
+                      "path":  "backend\\lib\\config.mjs",
+                      "bytes":  2261,
+                      "sha256":  "e8c8eba8210dfc727f2a7e8034c2fcd56e531c240869c8fe628ec68437869e68"
+                  },
+                  {
+                      "path":  "backend\\lib\\ledger.mjs",
+                      "bytes":  6706,
+                      "sha256":  "8134e3f6cd9466f0e7bb99edccd895993448e63a38ad0f3f12fe718c44fb24fa"
+                  },
+                  {
+                      "path":  "backend\\lib\\powercontext.mjs",
+                      "bytes":  4790,
+                      "sha256":  "5c945ee1c5622b1598dd3e6c2cbf90e9086dfde17047d4f1e597c314bec3bb8a"
+                  },
+                  {
+                      "path":  "backend\\lib\\service.mjs",
+                      "bytes":  14700,
+                      "sha256":  "868ba67f879334c593467123e6d5738528212f614bbc9c856c3c8f0aa41adffa"
+                  },
+                  {
+                      "path":  "backend\\lib\\text.mjs",
+                      "bytes":  4453,
+                      "sha256":  "e995491baeb9b96ac399dd1a8f737749af62cec44cbaceac6e580f83e1068d37"
+                  },
+                  {
+                      "path":  "backend\\package.json",
+                      "bytes":  386,
+                      "sha256":  "59fab604308e5ee378c55728c0a73bf1ad1c1fe993b0b87fd3a8918caf8a050d"
+                  },
+                  {
+                      "path":  "backend\\server.mjs",
+                      "bytes":  7397,
+                      "sha256":  "88b773abc7c278c59e7e57b6c062b6ca1f33990c5155345f58e7a6f9cdcc1615"
+                  },
+                  {
+                      "path":  "data\\.gitkeep",
+                      "bytes":  1,
+                      "sha256":  "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+                  },
+                  {
+                      "path":  "dify\\Memory_Pawnshop_Chatflow.yml",
+                      "bytes":  20056,
+                      "sha256":  "6daa36064c54225df6cfbc368078ce5ae58d7c57701742bde0ef91da495a6510"
+                  },
+                  {
+                      "path":  "docs\\DEMO.md",
+                      "bytes":  8167,
+                      "sha256":  "9700127f0c1962c7f635f889c2b3efd3371c4e59357e812d413f4630f40d4711"
+                  },
+                  {
+                      "path":  "docs\\VALIDATION.md",
+                      "bytes":  6495,
+                      "sha256":  "27b46238d8cbe7820a8c7415ca07202077428c8993154eee64ed18ca054c95b6"
+                  },
+                  {
+                      "path":  "evidence\\dify-demo-ledger.json",
+                      "bytes":  540,
+                      "sha256":  "d9bfb7e6c2925ffbe771b2e76c92389e99986284d693e54299666f71def69609"
+                  },
+                  {
+                      "path":  "evidence\\dsl-validation.json",
+                      "bytes":  7627,
+                      "sha256":  "e670e2ab8d0ce47efc3a838536cee7613c9d1d2ee5805caba629767bd1c466d0"
+                  },
+                  {
+                      "path":  "evidence\\README.md",
+                      "bytes":  2028,
+                      "sha256":  "3ec8bbfe83e71b05ea88e80e691f7dbc6ed0841e9a295f09d611e3473d39c63c"
+                  },
+                  {
+                      "path":  "evidence\\screenshots\\01-dify-recall-turn2.png",
+                      "bytes":  75695,
+                      "sha256":  "8382e9fa8202d4878da859879c5205cbabd6b33e52a532515401b672c9aaa0dd"
+                  },
+                  {
+                      "path":  "evidence\\screenshots\\02-dify-recall-turn2-detail.png",
+                      "bytes":  85137,
+                      "sha256":  "e597bbd007c893bcd2579b7f58c2d284e8e2093f3ad013e2e44807449751e7eb"
+                  },
+                  {
+                      "path":  "evidence\\screenshots\\03-dify-redeem-turn3.png",
+                      "bytes":  82681,
+                      "sha256":  "40095dd139aaf6efc9940aa1870dffe02b8cdeb9506fdaa5186f1a5da9eee7e7"
+                  },
+                  {
+                      "path":  "evidence\\screenshots\\recall-turn.png",
+                      "bytes":  10535,
+                      "sha256":  "1941e1b6ec3504ab544981b26001d66a83433906c74d57121e5fa4a86d42a4dd"
+                  },
+                  {
+                      "path":  "evidence\\verify-latest.json",
+                      "bytes":  6176,
+                      "sha256":  "99bfe715965c0c70689e377c7e2a193955f0b506d943f09ece5116007ecedda0"
+                  },
+                  {
+                      "path":  "README.md",
+                      "bytes":  15350,
+                      "sha256":  "5f1dc10fa7a7f6cbff49a4dc34c74764c8a24d3674c59d77cd8b59e2d07d7fb8"
+                  },
+                  {
+                      "path":  "scripts\\build_dsl.py",
+                      "bytes":  21981,
+                      "sha256":  "7fb8235c5b09a67d2a61cb18c2bf04ae7d73cbc18ed4831f29acd1bbcb5487ee"
+                  },
+                  {
+                      "path":  "scripts\\check-dify-prereqs.ps1",
+                      "bytes":  4955,
+                      "sha256":  "4bbacbbc679e27a0dfc72755ae07da174351ece5a37ded3af8840e126f96a0a4"
+                  },
+                  {
+                      "path":  "scripts\\package-submission.ps1",
+                      "bytes":  5026,
+                      "sha256":  "c9ead199f4c4df9d5b82bd5731735a31a032a139dc89f2213b85c5a5006d6447"
+                  },
+                  {
+                      "path":  "scripts\\seed-demo.mjs",
+                      "bytes":  2299,
+                      "sha256":  "a91c6ee4e213e4a1461a89981366dddc487411d48a80ce81ff3ad6079d8804be"
+                  },
+                  {
+                      "path":  "scripts\\setup-dify.ps1",
+                      "bytes":  7310,
+                      "sha256":  "27da32d92ca05540c87847fe3c0b557a3213f0b039ee17e4754aa95fbaed978d"
+                  },
+                  {
+                      "path":  "scripts\\start-local-stack.ps1",
+                      "bytes":  4918,
+                      "sha256":  "7c1f468aa7e7f54d4563649107a478aed41604cca2cede6d64d7ecbe41b3f3c1"
+                  },
+                  {
+                      "path":  "scripts\\validate_dsl.py",
+                      "bytes":  6116,
+                      "sha256":  "3682cf3f86e79a35ec629ce3d6d97312392aabe782f17a71b02625f5b7501f45"
+                  },
+                  {
+                      "path":  "scripts\\verify.mjs",
+                      "bytes":  9744,
+                      "sha256":  "098a11ae13794754ded47a88920347847c5c58ea74fa8bf704059e7efe89432d"
+                  }
+              ]
+}

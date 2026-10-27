@@ -1,0 +1,15 @@
+{
+  "name": "memory-pawnshop-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Zero-dependency adapter between the Dify Memory Pawnshop chatflow and PowerContext.",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "seed": "node ../scripts/seed-demo.mjs",
+    "verify": "node ../scripts/verify.mjs"
+  }
+}

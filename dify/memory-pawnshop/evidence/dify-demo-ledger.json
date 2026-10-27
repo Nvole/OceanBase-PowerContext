@@ -1,0 +1,11 @@
+{
+  "captured_at": "2026-10-28T03:16:34.7377264+08:00",
+  "ticket_id": "小满",
+  "ticket_count": 1,
+  "visits": 3,
+  "last_ticket_no": "MP-A18-001",
+  "last_item": "一把塑料直尺，只有十五厘米，断口磨得发亮，据说量什么都比整尺多半格。尺子背面印着谁的名字，已被辣条油浸得只剩一撇。",
+  "last_intent": "recall",
+  "last_status": "recall",
+  "note": "Dify 1.9.2 实机三轮演示后的账本快照：第一轮典当，第二、三轮只读，账本仍为 1 张当票。"
+}

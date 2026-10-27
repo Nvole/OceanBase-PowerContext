@@ -1,0 +1,5 @@
+backend/.env
+data/ledger.json
+data/*.tmp
+*.log
+
