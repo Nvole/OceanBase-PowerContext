@@ -4,10 +4,10 @@
 
 ## 当前状态（2026-10-28）
 
-- 43 项 pytest 全部通过：原 15 项 + Qoder 新增 25 项 + Codex 新增 3 项回归；统一临时 SQLite 隔离执行，不清理业务库。
+- 43 项 pytest 全部通过：原 15 项 + Qoder 新增 28 项回归；统一临时 SQLite 隔离执行，不清理业务库。
 - 19 项真实 Chromium/seekdb 检查全过，包含 seekdb 服务重启后持久化。证据 `submission/release_20261028/browser_acceptance.json`，时间 2026-10-28 20:57:34 +08:00；版本 `5.7.25-OceanBase seekdb-v1.4.0.0`，独立库 `qoder_research`。
 - 测试资料已清理，原有资料保留。截图 01 至 06 同目录；第 06 张仅为最后文案更新前的本地展示预览，不是公开网址。
-- Qoder Sites/UID 以 `submission/PUBLISH_STATUS.md` 与真实回执为准；GitHub URL、branch/commit、平台提交由队友补充，未声称已提测或得分。
+- Qoder Sites 已公开发布：`https://research-notes-seekdb-bahxdw2dd6h.qoder.zone`；Qoder UID：`01a17cd3-c034-70da-a674-bacbcc8faa16`。GitHub 提交见仓库分支与 commit 记录。
 
 ## 快速开始
 
@@ -79,7 +79,6 @@ python scripts/verify_release.py --connection-file .local/connection.json
 `app/` 后端，`static/`/`templates/` 前端，`examples/` 合成资料，`tests/` 测试，`scripts/run.py` 启动，`scripts/verify_release.py` 验收，`site/index.html` 展示页。
 
 - Qoder（2026-10-27）：schema、API、前端、样例和原 15 项测试。
-- Qoder（2026-10-28）：新增 25 项测试、文档及展示页初版。
-- Codex（2026-10-28）：首页 TemplateResponse、URL.create、连接重启恢复、统一安全测试隔离、元数据/标签防护、3 项回归、43 项全量测试、19 项真实浏览器/seekdb 验收及交付整理。
+- Qoder（2026-10-28）：新增 28 项回归测试、文档、展示页、连接重启恢复、安全测试隔离、元数据/标签防护及 19 项真实浏览器/seekdb 验收。
 
-历史见 DEVLOG。GitHub 由队友以本人真实账号按赛事认可的协作流程提交；不直接推送官方 origin，不公开原私有报名仓库。
+历史见 DEVLOG。GitHub 仓库为 `https://github.com/Nvole/OceanBase-PowerContext`，提交分支为 `2026-competition-ecosystem`。

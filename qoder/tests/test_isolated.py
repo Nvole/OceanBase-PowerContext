@@ -5,7 +5,7 @@
 # =============================================================================
 
 class TestHomepage:
-    """Verify the homepage renders correctly after Codex TemplateResponse fix."""
+    """Verify the homepage renders correctly after the TemplateResponse fix."""
 
     def test_homepage_returns_200(self, client):
         """GET / must return 200 with HTML content."""

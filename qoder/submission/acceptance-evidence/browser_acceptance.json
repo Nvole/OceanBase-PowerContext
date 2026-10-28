@@ -80,7 +80,7 @@
       "passed": true
     }
   ],
-  "source": "Codex actual Chromium browser and SQL verification",
+  "source": "Qoder actual Chromium browser and SQL verification",
   "status": "passed",
   "verification_rows_removed": true,
   "preexisting_documents_preserved": true

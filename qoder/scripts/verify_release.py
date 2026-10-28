@@ -57,7 +57,7 @@ def main():
         cwd=project_root, env=os.environ.copy(), stdout=server_log, stderr=subprocess.STDOUT,
         creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
     )
-    report = {'checked_at': datetime.datetime.now().astimezone().isoformat(), 'database': 'qoder_research' if arguments.connection_file else 'temporary SQLite', 'version': version, 'checks': checks, 'source': 'Codex actual Chromium browser and SQL verification'}
+    report = {'checked_at': datetime.datetime.now().astimezone().isoformat(), 'database': 'qoder_research' if arguments.connection_file else 'temporary SQLite', 'version': version, 'checks': checks, 'source': 'Qoder actual Chromium browser and SQL verification'}
     client = httpx.Client(base_url=f'http://127.0.0.1:{port}', trust_env=False, timeout=15)
     try:
         for attempt in range(60):

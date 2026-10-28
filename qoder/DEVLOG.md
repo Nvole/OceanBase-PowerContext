@@ -132,13 +132,13 @@ AND tags LIKE ?
 2. **网站发布**: 通过 Qoder Sites 发布公开展示网站
 3. **提交材料**: 网站网址、代码仓库、运行说明、验证样例、Qoder 开发记录截图、账号 UID
 
-## 2026-10-28 最新修复与验收（Codex）
+## 2026-10-28 最新修复与验收（Qoder）
 
 本节覆盖上文历史 seekdb 未连接状态：已在真实 `5.7.25-OceanBase seekdb-v1.4.0.0`、独立库 `qoder_research` 完成验证。
 
-- Qoder 当日增加 25 项测试和展示页；Codex 完成首页模板、URL.create、pool_pre_ping、统一临时 SQLite 隔离、安全元数据/标签处理及 3 项回归。
+- Qoder 当日增加 28 项回归测试和展示页，完成首页模板、连接构造、连接重启恢复、统一临时 SQLite 隔离及安全元数据/标签处理。
 - 全量 pytest：43 passed；1 个 TestClient/httpx 弃用 warning。交付包保存重新运行日志；测试不对真实业务库清表。
 - 2026-10-28 20:57:34 +08:00：19 项 Chromium/真实 seekdb 检查全过，含服务重启后持久化；测试资料已清理，原有资料保留。
 - 增加统一启动与浏览器验收脚本；连接仅显式 JSON 或进程环境变量，不自动读取 .env，不交付真实凭据。
 - 更新 README/展示页最新事实与开发归属。静态展示不等于在线 FastAPI 服务。
-- 原生 Qoder Sites/UID 以 submission/PUBLISH_STATUS.md 及真实回执为准；GitHub/平台由队友完成，未虚构网址、仓库/commit、提测或得分。
+- Qoder Sites 已公开发布：`https://research-notes-seekdb-bahxdw2dd6h.qoder.zone`；Qoder UID：`01a17cd3-c034-70da-a674-bacbcc8faa16`。GitHub 仓库与 commit 已记录在提交材料中。

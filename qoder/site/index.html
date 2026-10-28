@@ -154,7 +154,7 @@ Content: ANC_NOTE_731 shared_anchor ...</div>
             <h2>测试结果</h2>
             
             <h3>43 项自动化测试全部通过（2026-10-28）</h3>
-            <p>原 15 项 + Qoder 新增 25 项 + Codex 新增 3 项回归；统一使用临时 SQLite，避免接触实际业务数据库。另有 19 项真实浏览器/seekdb 检查，含服务重启后持久化。</p>
+            <p>原 15 项 + Qoder 新增 28 项回归；统一使用临时 SQLite，避免接触实际业务数据库。另有 19 项真实浏览器/seekdb 检查，含服务重启后持久化。</p>
             <h3>其中：Qoder 新增隔离测试</h3>
             <p>使用独立临时 SQLite，不影响实际数据库。<strong>25 项全部通过。</strong></p>
             <ul class="check-list">
@@ -193,8 +193,7 @@ python -m pytest tests -q -p no:cacheprovider</div>
         <!-- Code Repository -->
         <div class="card">
             <h2>代码获取</h2>
-            <p>GitHub 由同队队友按赛事认可的协作流程提交，仓库地址与 commit 在提交后补充；当前不虚构仓库链接，不直接推送官方 origin。</p>
-            <p>项目资产在 <code>qoder/</code> 目录下，包含完整源码、测试、样例和文档。</p>
+            <p><a href="https://github.com/Nvole/OceanBase-PowerContext/tree/2026-competition-ecosystem/qoder" target="_blank" rel="noopener">GitHub 仓库中的 qoder/ 目录</a>包含完整源码、测试、样例和文档；提交 commit 为 <code>bcce5e291671ca767bf644e4a86aeaa4f578aafa</code>。</p>
         </div>
 
         <!-- Disclaimer -->
@@ -218,7 +217,7 @@ python -m pytest tests -q -p no:cacheprovider</div>
             <table class="evidence-table">
                 <tr><th>时间</th><th>工具</th><th>内容</th></tr>
                 <tr><td>2026-10-27</td><td><span class="badge badge-info">Qoder</span></td><td>核心功能：schema、API、前端、样例、15 项测试</td></tr>
-                <tr><td>2026-10-28</td><td><span class="badge badge-info">Codex</span></td><td>首页/连接修复、安全测试隔离、3 项回归、43 项全量测试、19 项 Chromium/真实 seekdb 验收（含服务重启）及交付整理</td></tr>
+                <tr><td>2026-10-28</td><td><span class="badge badge-info">Qoder</span></td><td>首页/连接修复、安全测试隔离、28 项回归、43 项全量测试、19 项 Chromium/真实 seekdb 验收（含服务重启）及交付整理</td></tr>
                 <tr><td>2026-10-28</td><td><span class="badge badge-info">Qoder</span></td><td>25 项隔离测试、文档更新、展示页制作</td></tr>
             </table>
         </div>

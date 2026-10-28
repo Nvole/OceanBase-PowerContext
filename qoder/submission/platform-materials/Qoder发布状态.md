@@ -1,9 +1,10 @@
 # Qoder 原生发布状态
 
-2026-10-28：已在登录的 Qoder CN 原生会话发起静态展示页公开发布及 UID 核实。
+2026-10-28：Qoder Sites 原生静态托管已公开发布，站点设置为任何人可访问。
 
-当前尚未取得成功发布回执。不得将本地预览当公开网站，不得将昵称 nick4426705987 或 No.87408324 当已核实 UID。
+- 公开 URL：https://research-notes-seekdb-bahxdw2dd6h.qoder.zone
+- Qoder UID：01a17cd3-c034-70da-a674-bacbcc8faa16
+- 无登录浏览器验证：HTTP 200，页面标题为“科研资料检索助手 - 项目展示”。
+- Site ID：未在本次回执中提供。
 
-宿主成功后应生成 qoder_publish_receipt.json，包含真实公开 URL、Site ID、UID、访问权限、发布时间，并复核无登录访问。若文件未随包交付，队友最终填报前仍须补齐网站及 UID；代码可先合规提交。
-
-仅发布 site/index.html，不上传数据库、真实凭据、.env、私有报名源码或其他项目。GitHub URL/commit 和平台回执由队友补充。
+网站仅展示作品与复现说明；FastAPI 和 seekdb 后端仍需按 README 在本地独立运行。GitHub 仓库与提交信息见平台填报草稿。
