@@ -1,17 +1,18 @@
-# MiniMax 使用记录
+# MiniMax Usage Record
 
-- 状态：blocked
-- 是否实际参与：False
-- 模型：MiniMax-M2.5
-- 接口：https://api.minimax.io/v1/text/chatcompletion_v2
-- 原因：MINIMAX_API_KEY is unset. No dialogue was fabricated.
+- Status: completed
+- Participated: true
+- Model: MiniMax-M3.1-Flash
+- Endpoint: https://api.minimaxi.com/v1/text/chatcompletion_v2
+- HTTP status: 200
+- Applied file: src/lab/invoice_filter.py
+- Post-change tests: 21 passed
 
-日期范围代码是在记录修改前失败日志之后，于仓库内按规格补上的。
-没有 MINIMAX_API_KEY，因此没有编造助手回复。
-若之后设置该环境变量，`sdd_context.minimax_assistant.request_change` 会把查询到的上下文发给 MiniMax。
+The request used the seekdb-retrieved specification, code, tests, and task state as context. The returned Python module was syntax-checked, applied to the business file, and verified with the same target and regression tests. API keys and private model reasoning are not stored.
 
-## 本次上下文
+## Evidence
 
-任务、查询命中和来源见 `results/context.json` 与 `results/db_query_record.json`。
-规格句子更新前后见 `results/spec_refresh.json`。
-PowerContext：{"status": "reused", "version": "1.4.0", "url": "http://127.0.0.1:18617", "saved": {"status": "saved", "http_status": 200, "body_keys": ["changed", "records"]}, "restart": {"started": true, "status": "running", "ready": {"status": "ready", "checks": {"runtime": "ready", "database": "ready", "artifact_processing_supervisor": "disabled", "access_mode": "disabled", "authentication_provider": "disabled", "access_provider": "disabled", "access_resource_kinds": "server,scope,artifact", "access_artifact_families": "atomic-memory:enabled,experience:enabled,handoff:enabled,memory:enabled,profile:enabled,prompt:enabled,skill:enabled"}}}, "show_state_status": "ready", "used_in_context": true}
+- Context and sources: results/context.json and results/db_query_record.json
+- Specification refresh: results/spec_refresh.json
+- MiniMax call metadata and code hashes: results/minimax_status.json
+- Post-call tests: results/tests_after_minimax.txt

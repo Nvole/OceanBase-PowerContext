@@ -51,7 +51,11 @@
     "used_in_context": true
   },
   "minimax": {
-    "participated": false,
-    "status": "blocked"
+    "participated": true,
+    "status": "completed",
+    "model": "MiniMax-M3.1-Flash",
+    "http_status": 200,
+    "applied_to": "minimax\\src\\lab\\invoice_filter.py",
+    "tests_after_minimax_exit_code": 0
   }
 }

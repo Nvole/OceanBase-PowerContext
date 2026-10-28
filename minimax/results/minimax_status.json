@@ -1,7 +1,25 @@
 {
-  "participated": false,
-  "status": "blocked",
-  "reason": "MINIMAX_API_KEY is unset. No dialogue was fabricated.",
-  "endpoint": "https://api.minimax.io/v1/text/chatcompletion_v2",
-  "model": "MiniMax-M2.5"
+  "participated": true,
+  "status": "completed",
+  "http_status": 200,
+  "endpoint": "https://api.minimaxi.com/v1/text/chatcompletion_v2",
+  "model": "MiniMax-M3.1-Flash",
+  "assistant_content_length": 1725,
+  "assistant_content_sha256": "6441d5d5e2c73a57fcae23cb916701607cfbeefbdde00142b0f42602d3975e25",
+  "applied_to": "minimax\\src\\lab\\invoice_filter.py",
+  "code_sha256": "d77277f98ea6fa13a1a83f7fc25416acb98fb0f2bcb5625d3dcb3b23357cf31b",
+  "code_length": 1712,
+  "finish_reason": "stop",
+  "usage": {
+    "total_tokens": 5066,
+    "total_characters": 0,
+    "prompt_tokens": 2682,
+    "completion_tokens": 2384,
+    "completion_tokens_details": {
+      "reasoning_tokens": 2012
+    },
+    "prompt_tokens_details": {
+      "cached_tokens": 184
+    }
+  }
 }

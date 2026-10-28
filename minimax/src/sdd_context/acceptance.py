@@ -7,7 +7,7 @@ import sys
 import time
 from pathlib import Path
 
-from sdd_context.minimax_assistant import request_change
+from sdd_context.minimax_assistant import apply_assistant_module, request_change
 from sdd_context.paths import project_root, track_root
 from sdd_context.pc_service import binary, start, stop, wipe_home
 from sdd_context.store import import_materials
@@ -80,8 +80,22 @@ def main() -> int:
                 json.dumps({"sent": False, "prompt": mini.pop("prompt_preview_not_sent")}, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
-        (results / "minimax_status.json").write_text(json.dumps(mini, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        summary["minimax"] = {"participated": mini.get("participated"), "status": mini.get("status")}
+        if mini.get("participated"):
+            applied = apply_assistant_module(mini.get("assistant_content", ""), root / "src" / "lab" / "invoice_filter.py")
+            mini.update(applied)
+            test = subprocess.run(
+                [sys.executable, "-m", "unittest", "discover", "-s", str(root / "tests"), "-v"],
+                cwd=str(project_root()),
+                env={**os.environ, "PYTHONPATH": str(root / "src")},
+                text=True,
+                capture_output=True,
+            )
+            (results / "tests_after_minimax.txt").write_text(test.stdout + test.stderr + f"\nexit_code={test.returncode}\n", encoding="utf-8")
+            mini["applied_tests_exit_code"] = test.returncode
+            if test.returncode != 0:
+                raise AssertionError("tests failed after applying MiniMax response")
+        (results / "minimax_status.json").write_text(json.dumps({key: value for key, value in mini.items() if key != "assistant_content"}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        summary["minimax"] = {"participated": mini.get("participated"), "status": mini.get("status"), "applied_to": mini.get("applied_to")}
         _write_usage(root / "minimax" / "usage_record.md", mini, summary)
     except Exception as exc:
         summary["error"] = _public_error(exc)
@@ -237,23 +251,25 @@ def _brief(payload: dict) -> dict:
 def _write_usage(path: Path, mini: dict, summary: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
-        "# MiniMax 使用记录",
+        "# MiniMax ????",
         "",
-        f"- 状态：{mini.get('status')}",
-        f"- 是否实际参与：{mini.get('participated')}",
-        f"- 模型：{mini.get('model', '')}",
-        f"- 接口：{mini.get('endpoint', '')}",
-        f"- 原因：{mini.get('reason', '')}",
+        f"- ???{mini.get('status')}",
+        f"- ???????{mini.get('participated')}",
+        f"- ???{mini.get('model', '')}",
+        f"- ???{mini.get('endpoint', '')}",
+        f"- HTTP ???{mini.get('http_status', '')}",
+        f"- ?????{mini.get('applied_to', '???')}",
+        f"- ?????????{mini.get('applied_tests_exit_code', '???')}",
+        f"- ???{mini.get('reason', '')}",
         "",
-        "日期范围代码是在记录修改前失败日志之后，于仓库内按规格补上的。",
-        "没有 MINIMAX_API_KEY，因此没有编造助手回复。",
-        "若之后设置该环境变量，`sdd_context.minimax_assistant.request_change` 会把查询到的上下文发给 MiniMax。",
+        "?????? seekdb ???????????????????????MiniMax ?????????????????????????????????",
+        "??? API Key ?????????",
         "",
-        "## 本次上下文",
+        "## ?????",
         "",
-        "任务、查询命中和来源见 `results/context.json` 与 `results/db_query_record.json`。",
-        "规格句子更新前后见 `results/spec_refresh.json`。",
-        f"PowerContext：{json.dumps(summary.get('powercontext'), ensure_ascii=False)}",
+        "??????????? `results/context.json` ? `results/db_query_record.json`?",
+        "????????? `results/spec_refresh.json`?",
+        f"PowerContext?{json.dumps(summary.get('powercontext'), ensure_ascii=False)}",
         "",
     ]
     path.write_text("\n".join(lines), encoding="utf-8")

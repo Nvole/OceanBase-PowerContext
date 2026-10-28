@@ -9,7 +9,7 @@
 - seekdb：已有服务 `127.0.0.1:2881`，本题账号见本目录 `.env`（权限 600，不要提交）
 - pyseekdb 1.4.0.post1，PyMySQL 1.2.3
 - PowerContext 1.4.0：本题目录 `.powercontext/venv`，只监听 `127.0.0.1:18617`，SQLite 放在 `.powercontext/home`
-- MiniMax：仅当环境变量 `MINIMAX_API_KEY` 存在时调用 `https://api.minimax.io/v1/text/chatcompletion_v2`。没有该变量时不编造对话
+- MiniMax：仅当环境变量 `MINIMAX_API_KEY` 存在时调用 `https://api.minimaxi.com/v1/text/chatcompletion_v2`，默认模型为 `MiniMax-M3.1-Flash`。没有该变量时不编造对话
 
 `.env` 只保存 seekdb 连接。不要把 MiniMax key 写进仓库。
 

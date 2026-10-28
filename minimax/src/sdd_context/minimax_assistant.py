@@ -1,12 +1,14 @@
 """Call MiniMax only when MINIMAX_API_KEY is present. Never invent a reply."""
 
+import ast
 import json
+import re
 import os
 import urllib.error
 import urllib.request
 
-ENDPOINT = os.environ.get("MINIMAX_BASE_URL", "https://api.minimax.io").rstrip("/") + "/v1/text/chatcompletion_v2"
-MODEL = os.environ.get("MINIMAX_MODEL", "MiniMax-M2.5")
+ENDPOINT = os.environ.get("MINIMAX_BASE_URL", "https://api.minimaxi.com").rstrip("/") + "/v1/text/chatcompletion_v2"
+MODEL = os.environ.get("MINIMAX_MODEL", "MiniMax-M3.1-Flash")
 
 
 def status() -> dict:
@@ -56,15 +58,36 @@ def request_change(task: str, context_payload: dict) -> dict:
         return {"participated": False, "status": "http_error", "http_status": error.code, "detail": detail[:2000], "model": MODEL}
     except (OSError, urllib.error.URLError, json.JSONDecodeError) as exc:
         return {"participated": False, "status": "request_failed", "error": type(exc).__name__, "model": MODEL}
-    message = (((body.get("choices") or [{}])[0].get("message")) or {})
+    base_resp = body.get("base_resp") or {}
+    provider_status = base_resp.get("status_code", 0)
+    if provider_status not in (0, None):
+        return {
+            "participated": False,
+            "status": "provider_error",
+            "http_status": http_status,
+            "provider_status": provider_status,
+            "reason": base_resp.get("status_msg", "MiniMax provider error"),
+            "model": MODEL,
+        }
+    choices = body.get("choices") or []
+    message = ((choices[0].get("message") if choices else None) or {})
+    content = message.get("content") or message.get("reasoning_content") or ""
+    if not content:
+        return {
+            "participated": False,
+            "status": "empty_response",
+            "http_status": http_status,
+            "reason": "MiniMax returned no assistant content",
+            "model": body.get("model") or MODEL,
+        }
     return {
         "participated": True,
         "status": "completed",
         "http_status": http_status,
         "model": body.get("model") or MODEL,
         "usage": body.get("usage") or {},
-        "assistant_content": message.get("content") or "",
-        "finish_reason": ((body.get("choices") or [{}])[0].get("finish_reason")),
+        "assistant_content": content,
+        "finish_reason": ((choices[0] if choices else {}).get("finish_reason")),
     }
 
 
@@ -78,3 +101,15 @@ def _prompt(task: str, context_payload: dict) -> str:
         parts.append("\n[任务状态]\n" + state)
     parts.append("\n请只实现规格里尚未落地的日期范围行为，并保持金额与状态行为不变。")
     return "\n".join(parts)
+
+
+def apply_assistant_module(content: str, destination: str | os.PathLike[str]) -> dict:
+    match = re.search(r"```(?:python)?\s*(.*?)```", content, flags=re.IGNORECASE | re.DOTALL)
+    module = (match.group(1) if match else content).strip() + "\n"
+    ast.parse(module)
+    if "def filter_invoices" not in module or 'REVISION = "date-range-applied"' not in module:
+        raise ValueError("MiniMax response did not contain the required invoice filter revision")
+    target = os.fspath(destination)
+    with open(target, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(module)
+    return {"applied_to": target, "code_sha256": __import__("hashlib").sha256(module.encode()).hexdigest(), "code_length": len(module)}
