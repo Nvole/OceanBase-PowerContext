@@ -11,4 +11,4 @@
 
 GitHub 仓库：https://github.com/Nvole/OceanBase-PowerContext
 分支：`2026-competition-ecosystem`
-提交：`bcce5e291671ca767bf644e4a86aeaa4f578aafa`
+提交：`ada63448d1fdc89fb9d2a076ba0335ff146ebb79`
