@@ -1,0 +1,15 @@
+﻿
+> stepfun-edge-seekdb-kb@1.0.0 test
+> node --test tests/*.test.mjs
+
+✔ validates normalized vectors and collection names (2.0005ms)
+✔ validates documents and query payloads (1.0006ms)
+✔ serial queue preserves order after a rejected action (1.0717ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 200.322

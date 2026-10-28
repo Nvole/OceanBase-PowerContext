@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-10-28T14:04:46.663Z",
+  "note": "Same browser-generated vectors, same collection, same per-document write size, alternating policies; first pair is warmup, next three pairs are measured. Only refresh frequency differs.",
+  "runs": [
+    {
+      "repeat": 0,
+      "warmup": true,
+      "policy": "each",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 216.24189999998634,
+      "refreshMs": 11340.131799999988,
+      "totalMs": 11560.605599999995,
+      "refreshPolicy": "each",
+      "writeBatchSize": 1,
+      "refreshCalls": 18
+    },
+    {
+      "repeat": 0,
+      "warmup": true,
+      "policy": "batch",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 120.17750000000524,
+      "refreshMs": 464.568299999999,
+      "totalMs": 586.2180000000008,
+      "refreshPolicy": "batch",
+      "writeBatchSize": 1,
+      "refreshCalls": 1
+    },
+    {
+      "repeat": 1,
+      "warmup": false,
+      "policy": "each",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 141.25859999999375,
+      "refreshMs": 10903.14100000001,
+      "totalMs": 11045.9444,
+      "refreshPolicy": "each",
+      "writeBatchSize": 1,
+      "refreshCalls": 18
+    },
+    {
+      "repeat": 1,
+      "warmup": false,
+      "policy": "batch",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 108.67149999999674,
+      "refreshMs": 559.4660999999978,
+      "totalMs": 669.6208999999944,
+      "refreshPolicy": "batch",
+      "writeBatchSize": 1,
+      "refreshCalls": 1
+    },
+    {
+      "repeat": 2,
+      "warmup": false,
+      "policy": "each",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 147.01820000001317,
+      "refreshMs": 10509.416200000014,
+      "totalMs": 10657.947000000007,
+      "refreshPolicy": "each",
+      "writeBatchSize": 1,
+      "refreshCalls": 18
+    },
+    {
+      "repeat": 2,
+      "warmup": false,
+      "policy": "batch",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 110.34369999999763,
+      "refreshMs": 475.40230000000156,
+      "totalMs": 587.2464000000036,
+      "refreshPolicy": "batch",
+      "writeBatchSize": 1,
+      "refreshCalls": 1
+    },
+    {
+      "repeat": 3,
+      "warmup": false,
+      "policy": "each",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 144.04349999999977,
+      "refreshMs": 14111.25509999998,
+      "totalMs": 14257.030899999998,
+      "refreshPolicy": "each",
+      "writeBatchSize": 1,
+      "refreshCalls": 18
+    },
+    {
+      "repeat": 3,
+      "warmup": false,
+      "policy": "batch",
+      "accepted": 18,
+      "count": 18,
+      "writeMs": 110.86850000004051,
+      "refreshMs": 492.4661000000051,
+      "totalMs": 605.123299999992,
+      "refreshPolicy": "batch",
+      "writeBatchSize": 1,
+      "refreshCalls": 1
+    }
+  ]
+}

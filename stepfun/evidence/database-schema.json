@@ -1,0 +1,68 @@
+{
+  "database": "stepfun_kb",
+  "version": [
+    {
+      "version": "5.7.25-OceanBase seekdb-v1.4.0.0"
+    }
+  ],
+  "table": "c$v2$01084a62d2d811f1bfc94c2338c5c3af",
+  "ddl": [
+    {
+      "Table": "c$v2$01084a62d2d811f1bfc94c2338c5c3af",
+      "Create Table": "CREATE TABLE `c$v2$01084a62d2d811f1bfc94c2338c5c3af` (\n  `_id` varbinary(512) NOT NULL,\n  `document` string DEFAULT NULL,\n  `embedding` VECTOR(384) DEFAULT NULL,\n  `metadata` json DEFAULT NULL,\n  PRIMARY KEY (`_id`),\n  FULLTEXT KEY `idx_fts` (`document`) WITH PARSER space PARSER_PROPERTIES=(min_token_size=3,max_token_size=84) BLOCK_SIZE 16384,\n  VECTOR KEY `idx_vec` (`embedding`) WITH (DISTANCE=COSINE, TYPE=HNSW, LIB=VSAG, M=16, EF_CONSTRUCTION=200, EF_SEARCH=64, SYNC_MODE=ASYNC) BLOCK_SIZE 16384\n) ORGANIZATION HEAP DEFAULT CHARSET = utf8mb4 ROW_FORMAT = DYNAMIC COMPRESSION = 'zstd_1.3.8' BLOCK_SIZE = 16384 TABLET_SIZE = 134217728 PCTFREE = 0 LOB_INROW_THRESHOLD=78643"
+    }
+  ],
+  "indexes": [
+    {
+      "Table": "c$v2$01084a62d2d811f1bfc94c2338c5c3af",
+      "Non_unique": 0,
+      "Key_name": "PRIMARY",
+      "Seq_in_index": 1,
+      "Column_name": "_id",
+      "Collation": "A",
+      "Cardinality": null,
+      "Sub_part": null,
+      "Packed": null,
+      "Null": "",
+      "Index_type": "BTREE",
+      "Comment": "available",
+      "Index_comment": "",
+      "Visible": "YES",
+      "Expression": null
+    },
+    {
+      "Table": "c$v2$01084a62d2d811f1bfc94c2338c5c3af",
+      "Non_unique": 1,
+      "Key_name": "idx_fts",
+      "Seq_in_index": 1,
+      "Column_name": "document",
+      "Collation": "A",
+      "Cardinality": null,
+      "Sub_part": null,
+      "Packed": null,
+      "Null": "YES",
+      "Index_type": "FULLTEXT",
+      "Comment": "available",
+      "Index_comment": "",
+      "Visible": "YES",
+      "Expression": null
+    },
+    {
+      "Table": "c$v2$01084a62d2d811f1bfc94c2338c5c3af",
+      "Non_unique": 1,
+      "Key_name": "idx_vec",
+      "Seq_in_index": 1,
+      "Column_name": "embedding",
+      "Collation": "A",
+      "Cardinality": null,
+      "Sub_part": null,
+      "Packed": null,
+      "Null": "YES",
+      "Index_type": "VECTOR",
+      "Comment": "available",
+      "Index_comment": "",
+      "Visible": "YES",
+      "Expression": null
+    }
+  ]
+}

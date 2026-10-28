@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-10-28T14:42:00.133Z",
+  "success": true,
+  "context": "Fresh ZIP extraction; npm ci --offline installed 69 packages without original node_modules",
+  "checks": {
+    "offlineNpmCi": true,
+    "unitTests": 3,
+    "build": true,
+    "pinnedModelHashes": true,
+    "realBrowserEmbedding": true,
+    "seekdbImport18Chunks": true,
+    "hybridSearchCorrectFirstResult": true,
+    "noExternalRequests": true
+  },
+  "imported": "导入完成：18 个块，backend=wasm",
+  "status": "检索完成：5 条，backend=wasm",
+  "metrics": {
+    "queryLoadMs": 0.009999990463256836,
+    "queryEmbeddingMs": 9.364999994635582,
+    "browserBackend": "wasm",
+    "fallback": null,
+    "dbMs": 39.00989999999729,
+    "endToEndMs": 54.95000000298023
+  },
+  "errors": [],
+  "requests": [
+    "http://127.0.0.1:8011/",
+    "http://127.0.0.1:8011/style.css",
+    "http://127.0.0.1:8011/app.js",
+    "http://127.0.0.1:8011/api/collections",
+    "http://127.0.0.1:8011/data/corpus.json",
+    "http://127.0.0.1:8011/embedding.worker.js",
+    "http://127.0.0.1:8011/models/Xenova/all-MiniLM-L6-v2/tokenizer.json",
+    "http://127.0.0.1:8011/models/Xenova/all-MiniLM-L6-v2/tokenizer_config.json",
+    "http://127.0.0.1:8011/models/Xenova/all-MiniLM-L6-v2/config.json",
+    "http://127.0.0.1:8011/models/Xenova/all-MiniLM-L6-v2/onnx/model_quantized.onnx",
+    "http://127.0.0.1:8011/vendor/ort/ort-wasm-simd-threaded.jsep.mjs",
+    "http://127.0.0.1:8011/vendor/ort/ort-wasm-simd-threaded.jsep.mjs",
+    "http://127.0.0.1:8011/vendor/ort/ort-wasm-simd-threaded.jsep.mjs",
+    "http://127.0.0.1:8011/vendor/ort/ort-wasm-simd-threaded.jsep.mjs",
+    "http://127.0.0.1:8011/vendor/ort/ort-wasm-simd-threaded.jsep.wasm",
+    "http://127.0.0.1:8011/api/import",
+    "http://127.0.0.1:8011/api/collections",
+    "http://127.0.0.1:8011/api/search"
+  ],
+  "note": "Credentials injected in process memory. Offline dependency installation uses local npm cache, not bundled node_modules. WSL service must remain running."
+}

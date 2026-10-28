@@ -1,0 +1,226 @@
+{
+  "timestamp": "2026-10-28T14:00:47.264Z",
+  "model": {
+    "model_id": "Xenova/all-MiniLM-L6-v2",
+    "revision": "751bff37182d3f1213fa05d7196b954e230abad9",
+    "license": "Apache-2.0",
+    "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/tree/751bff37182d3f1213fa05d7196b954e230abad9",
+    "dimension": 384,
+    "pooling": "mean",
+    "normalization": "l2",
+    "files": [
+      {
+        "path": "config.json",
+        "bytes": 650,
+        "sha256": "7135149f7cffa1a573466c6e4d8423ed73b62fd2332c575bf738a0d033f70df7",
+        "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff37182d3f1213fa05d7196b954e230abad9/config.json"
+      },
+      {
+        "path": "tokenizer.json",
+        "bytes": 711661,
+        "sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0",
+        "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff37182d3f1213fa05d7196b954e230abad9/tokenizer.json"
+      },
+      {
+        "path": "tokenizer_config.json",
+        "bytes": 366,
+        "sha256": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3",
+        "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff37182d3f1213fa05d7196b954e230abad9/tokenizer_config.json"
+      },
+      {
+        "path": "special_tokens_map.json",
+        "bytes": 125,
+        "sha256": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+        "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff37182d3f1213fa05d7196b954e230abad9/special_tokens_map.json"
+      },
+      {
+        "path": "vocab.txt",
+        "bytes": 231508,
+        "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+        "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff37182d3f1213fa05d7196b954e230abad9/vocab.txt"
+      },
+      {
+        "path": "onnx/model.onnx",
+        "bytes": 90387606,
+        "sha256": "759c3cd2b7fe7e93933ad23c4c9181b7396442a2ed746ec7c1d46192c469c46e",
+        "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff37182d3f1213fa05d7196b954e230abad9/onnx/model.onnx"
+      },
+      {
+        "path": "onnx/model_quantized.onnx",
+        "bytes": 22972370,
+        "sha256": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1",
+        "source": "https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/751bff37182d3f1213fa05d7196b954e230abad9/onnx/model_quantized.onnx"
+      }
+    ],
+    "fp32_bytes": 90387606,
+    "q8_bytes": 22972370,
+    "q8_compression_ratio": 3.9346,
+    "fp32_bundle_bytes": 91331916,
+    "q8_bundle_bytes": 23916680
+  },
+  "configs": [
+    {
+      "dtype": "fp32",
+      "requested": "wasm",
+      "actual": "wasm",
+      "batchSize": 1,
+      "warmRepeats": 3,
+      "coldLoadMs": 3731.265000000596,
+      "coldInferenceMs": 760.8250000029802,
+      "docMs": 489.39000000059605,
+      "writeMs": 120.62840000000142,
+      "refreshMs": 469.1814000000013,
+      "queryMs": 9.507499992847443,
+      "dbMs": 9.017800000001444,
+      "e2eMs": 24.180000007152557,
+      "recallAt5": 0.9166666666666666,
+      "ndcgAt5": 0.9166666666666666
+    },
+    {
+      "dtype": "fp32",
+      "requested": "wasm",
+      "actual": "wasm",
+      "batchSize": 8,
+      "warmRepeats": 3,
+      "coldLoadMs": 0.005000010132789612,
+      "coldInferenceMs": 485.00999999046326,
+      "docMs": 496.3349999934435,
+      "writeMs": 117.69900000000052,
+      "refreshMs": 579.7661999999982,
+      "queryMs": 9.754999995231628,
+      "dbMs": 9.142149999996036,
+      "e2eMs": 24.577500000596046,
+      "recallAt5": 0.9166666666666666,
+      "ndcgAt5": 0.9166666666666666
+    },
+    {
+      "dtype": "q8",
+      "requested": "wasm",
+      "actual": "wasm",
+      "batchSize": 1,
+      "warmRepeats": 3,
+      "coldLoadMs": 784.6800000071526,
+      "coldInferenceMs": 467.04500000178814,
+      "docMs": 444.45499999821186,
+      "writeMs": 113.89080000000104,
+      "refreshMs": 587.6440999999977,
+      "queryMs": 9.349999994039536,
+      "dbMs": 8.817049999997835,
+      "e2eMs": 23.43249999731779,
+      "recallAt5": 0.9166666666666666,
+      "ndcgAt5": 0.9166666666666666
+    },
+    {
+      "dtype": "q8",
+      "requested": "wasm",
+      "actual": "wasm",
+      "batchSize": 8,
+      "warmRepeats": 3,
+      "coldLoadMs": 0.004999995231628418,
+      "coldInferenceMs": 369.0100000053644,
+      "docMs": 363.7849999964237,
+      "writeMs": 111.93659999999363,
+      "refreshMs": 466.4982999999993,
+      "queryMs": 9.299999997019768,
+      "dbMs": 8.82470000000103,
+      "e2eMs": 23.60249999165535,
+      "recallAt5": 0.9166666666666666,
+      "ndcgAt5": 0.9166666666666666
+    },
+    {
+      "dtype": "fp32",
+      "requested": "webgpu",
+      "actual": "webgpu",
+      "batchSize": 8,
+      "warmRepeats": 3,
+      "coldLoadMs": 934.2800000011921,
+      "coldInferenceMs": 1544.9549999982119,
+      "docMs": 274.5,
+      "writeMs": 115.67320000000473,
+      "refreshMs": 651.3549999999959,
+      "queryMs": 16.327500000596046,
+      "dbMs": 9.121650000000955,
+      "e2eMs": 31.570000000298023,
+      "recallAt5": 0.9166666666666666,
+      "ndcgAt5": 0.9166666666666666
+    },
+    {
+      "dtype": "q8",
+      "requested": "webgpu",
+      "actual": "wasm",
+      "batchSize": 8,
+      "warmRepeats": 3,
+      "coldLoadMs": 1048.1349999904633,
+      "coldInferenceMs": 359.47000001370907,
+      "docMs": 376.4800000041723,
+      "writeMs": 111.41890000000421,
+      "refreshMs": 465.5051999999996,
+      "queryMs": 9.850000001490116,
+      "dbMs": 9.175800000004529,
+      "e2eMs": 25.28499999642372,
+      "recallAt5": 0.9166666666666666,
+      "ndcgAt5": 0.9166666666666666
+    }
+  ],
+  "refresh": [
+    {
+      "policy": "each",
+      "repeats": 3,
+      "writeBatchSize": 1,
+      "refreshCalls": 18,
+      "writeMs": 144.04349999999977,
+      "refreshMs": 10903.14100000001,
+      "totalMs": 11045.9444
+    },
+    {
+      "policy": "batch",
+      "repeats": 3,
+      "writeBatchSize": 1,
+      "refreshCalls": 1,
+      "writeMs": 110.34369999999763,
+      "refreshMs": 492.4661000000051,
+      "totalMs": 605.123299999992
+    }
+  ],
+  "checks": {
+    "quantizationQualityGate": true,
+    "idempotentUpsert": true,
+    "incrementalVisibility": true,
+    "collectionIsolation": true,
+    "precisionIsolation": true,
+    "xssEscaped": true,
+    "pageReload": true,
+    "fileUploadUiAndStableUnicodeIds": true,
+    "originAndMalformedPayload": true,
+    "invalidVectorRejected": true,
+    "noExternalNetwork": true,
+    "automaticFallback": true
+  },
+  "persistence": {
+    "timestamp": "2026-10-28T14:03:49.702Z",
+    "target": {
+      "collection": "state_mvs6mm3s",
+      "dtype": "q8",
+      "query": "penguins",
+      "expectedId": "penguin"
+    },
+    "success": true,
+    "status": "检索完成：2 条，backend=wasm",
+    "metrics": {
+      "queryLoadMs": 1786.8699999898672,
+      "queryEmbeddingMs": 167.34000000357628,
+      "browserBackend": "wasm",
+      "fallback": null,
+      "dbMs": 34.19130000000223,
+      "endToEndMs": 2143.405000001192
+    },
+    "note": "Fresh browser after application server restart; existing seekdb data queried with newly computed browser embedding. Database process itself was not restarted."
+  },
+  "limitations": [
+    "18 hand-authored English documents / 12 queries only; no large-scale, multilingual or statistical significance claim",
+    "GPU adapter selected by headless Edge is AMD RDNA-2 hardware, not the installed NVIDIA GPU",
+    "INT8 WebGPU failed numeric consistency on this runtime/device and is automatically rejected; final INT8 GPU-preferred runs actually use WASM",
+    "No GitHub push or competition scoring receipt",
+    "Docker convenience deployment was not used or validated locally; actual DB is WSL seekdb 1.4.0.0"
+  ]
+}

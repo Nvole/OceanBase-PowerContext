@@ -1,0 +1,20 @@
+{
+  "name": "stepfun-edge-seekdb-kb",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node --env-file-if-exists=.env server.mjs",
+    "models": "python scripts/download_models.py",
+    "test": "node --test tests/*.test.mjs",
+    "verify": "node scripts/verify-browser.mjs",
+    "report": "node scripts/report.mjs",
+    "verify:persistence": "node scripts/verify-persistence.mjs",
+    "inspect": "node --env-file-if-exists=.env scripts/inspect-database.mjs",
+    "verify:refresh": "node scripts/verify-refresh.mjs"
+  },
+  "dependencies": { "@huggingface/transformers": "3.8.1", "seekdb": "1.4.0" },
+  "devDependencies": { "esbuild": "0.25.12", "playwright": "1.64.1" }
+}

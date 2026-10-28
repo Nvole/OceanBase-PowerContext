@@ -1,0 +1,8 @@
+node_modules/
+dist/
+models/
+.env
+*.db
+*.sqlite*
+.local/
+evidence/private/

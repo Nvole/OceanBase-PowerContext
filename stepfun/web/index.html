@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StepFun · 端侧 Embedding + seekdb 混合检索</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<main>
+<h1>StepFun：浏览器本地 Embedding + seekdb 混合检索</h1>
+<p class="note">文档和查询 embedding 只在浏览器 Worker 完成；Node 仅接收向量、写入并调用 seekdb hybridSearch。</p>
+<section class="grid">
+<label>集合名 <input id="collection" value="demo"></label>
+<label>精度 <select id="dtype"><option value="fp32">FP32</option><option value="q8" selected>INT8 / q8</option></select></label>
+<label>设备 <select id="device"><option value="webgpu">WebGPU 优先，失败降 WASM</option><option value="wasm">强制 WASM</option></select></label>
+<label>batch <select id="batchSize"><option selected>1</option><option>8</option></select></label>
+<label>索引刷新 <select id="refreshPolicy"><option value="batch">批量一次</option><option value="each">每批一次</option></select></label>
+</section>
+<section><button id="loadCorpus">载入固定英语语料</button><label>文件 <input id="file" type="file" accept=".txt,.md"></label><label>标题 <input id="title" value="manual"></label><textarea id="text" placeholder="或粘贴 .txt/.md 文本"></textarea><button id="import">本地向量化并导入 seekdb</button></section>
+<section><label>查询 <input id="query" value="How do I reduce vector search latency?"></label><label>topK <input id="topK" type="number" value="5" min="1" max="20"></label><button id="search">查询</button><button id="refresh">刷新集合状态</button></section>
+<p id="status" data-kind="">准备就绪</p>
+<section><h2>计时 / backend</h2><pre id="metrics">{}</pre><h2>seekdb 集合</h2><pre id="collections">[]</pre></section>
+<section><h2>结果</h2><div id="results"></div></section>
+</main><script type="module" src="/app.js"></script>
+</body></html>

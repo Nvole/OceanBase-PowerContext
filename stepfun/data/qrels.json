@@ -1,0 +1,14 @@
+{
+  "How do I reduce vector search latency?": ["latency", "hnsw"],
+  "How does INT8 affect model size?": ["quantization"],
+  "How does the browser fall back when WebGPU fails?": ["webgpu"],
+  "How do I add new documents safely?": ["incremental"],
+  "How are token embeddings combined and normalized?": ["pooling"],
+  "How should I split a long document before embedding?": ["chunking"],
+  "How can I avoid initializing the model for every request?": ["cache"],
+  "What measures the ranking quality of retrieved documents?": ["metrics"],
+  "How do I prepare tomato pasta?": ["recipe"],
+  "How should I water vegetables?": ["garden"],
+  "How do I maintain a bicycle chain and brakes?": ["bicycle"],
+  "What helps me see faint stars?": ["astronomy"]
+}

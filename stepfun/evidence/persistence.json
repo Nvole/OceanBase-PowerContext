@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-10-28T14:03:49.702Z",
+  "target": {
+    "collection": "state_mvs6mm3s",
+    "dtype": "q8",
+    "query": "penguins",
+    "expectedId": "penguin"
+  },
+  "success": true,
+  "status": "检索完成：2 条，backend=wasm",
+  "metrics": {
+    "queryLoadMs": 1786.8699999898672,
+    "queryEmbeddingMs": 167.34000000357628,
+    "browserBackend": "wasm",
+    "fallback": null,
+    "dbMs": 34.19130000000223,
+    "endToEndMs": 2143.405000001192
+  },
+  "note": "Fresh browser after application server restart; existing seekdb data queried with newly computed browser embedding. Database process itself was not restarted."
+}
