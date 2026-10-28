@@ -1,278 +1,152 @@
 {
-  "application": "离谱辩题",
-  "dify_imported": false,
-  "dify_ui_available": false,
-  "note": "本机没有 Dify 界面，DSL 未导入。下面按 DSL 的顺序用 curl 打完一局：输入、HTTP 检索、回应、HTTP 保存、输出。",
-  "dsl": "docs/absurd_debate.dsl.yml",
-  "orchestration": [
-    "输入",
-    "HTTP 检索",
-    "回应",
-    "HTTP 保存",
-    "输出"
-  ],
-  "bind": "127.0.0.1:18604",
-  "collection": "track04_debate",
-  "input": {
-    "player": "夜班辩手",
-    "motion": "猫应该交税",
-    "side": "正方",
-    "argument": "猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。",
-    "n_results": 3
-  },
-  "server_pid": 2240056,
-  "listen": [
-    "LISTEN 0      5          127.0.0.1:18604      0.0.0.0:*"
-  ],
-  "server_left_running": true,
-  "steps": {
-    "health": {
-      "http_code": "200",
-      "stderr": "",
-      "body": {
-        "ok": true,
-        "bind": "127.0.0.1:18604",
-        "collection": "track04_debate",
-        "count": 6
-      },
-      "curl": [
-        "curl",
-        "-sS",
-        "-m",
-        "30",
-        "-o",
-        "/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/health.json",
-        "-w",
-        "%{http_code}",
-        "-H",
-        "Content-Type: application/json; charset=utf-8",
-        "http://127.0.0.1:18604/health"
-      ]
-    },
-    "retrieve": {
-      "http_code": "200",
-      "stderr": "",
-      "body": {
-        "collection": "track04_debate",
-        "fusion": "seekdb_hybrid_rrf",
-        "keywords": [
-          "交税",
-          "阳光",
-          "呼噜"
-        ],
-        "query_text": "猫应该交税\n猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。",
-        "hits": [
-          {
-            "id": "seed_cat_pro",
-            "document": "【辩题】猫应该交税\n【立场】正方\n【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝征收阳光税。",
-            "metadata": {
-              "role": "seed",
-              "side": "正方",
-              "score": 0,
-              "motion": "猫应该交税",
-              "player": "阳光审计员",
-              "cited_id": "",
-              "round_id": "seed_cat_pro"
-            },
-            "score": 0.0328
-          },
-          {
-            "id": "seed_cat_con",
-            "document": "【辩题】猫应该交税\n【立场】反方\n【发言】猫已经用抓沙发支付了租金，再征税就是对夜间巡逻的双重课税。",
-            "metadata": {
-              "role": "seed",
-              "side": "反方",
-              "score": 0,
-              "motion": "猫应该交税",
-              "player": "猫工会",
-              "cited_id": "",
-              "round_id": "seed_cat_con"
-            },
-            "score": 0.0323
-          },
-          {
-            "id": "seed_fridge",
-            "document": "【辩题】冰箱应该有投票权\n【立场】正方\n【发言】冰箱保管全家的口粮，比弃票的人类更了解民生。",
-            "metadata": {
-              "role": "seed",
-              "side": "正方",
-              "score": 0,
-              "motion": "冰箱应该有投票权",
-              "player": "冷藏代表",
-              "cited_id": "",
-              "round_id": "seed_fridge"
-            },
-            "score": 0.0159
-          }
-        ]
-      },
-      "curl": [
-        "curl",
-        "-sS",
-        "-m",
-        "30",
-        "-o",
-        "/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/retrieve.json",
-        "-w",
-        "%{http_code}",
-        "-H",
-        "Content-Type: application/json; charset=utf-8",
-        "--data-binary",
-        "@/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/retrieve_body.json",
-        "http://127.0.0.1:18604/v1/retrieve"
-      ]
-    },
-    "respond": {
-      "http_code": "200",
-      "stderr": "",
-      "body": {
-        "rebuttal": "主持人杠精站反方。夜班辩手，你以正方主张「猫应该交税」。我翻到旧档案 seed_cat_pro：阳光审计员说过「【辩题】猫应该交税 【立场】正方 【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。」作为定论。离谱指数 72/99。下一句请给一个反例，不许只加感叹号。",
-        "score": 72,
-        "cited_id": "seed_cat_pro",
-        "host_side": "反方",
-        "round_id": "f7f75665",
-        "host": "主持人杠精",
-        "player": "夜班辩手",
-        "motion": "猫应该交税",
-        "side": "正方",
-        "argument": "猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。"
-      },
-      "curl": [
-        "curl",
-        "-sS",
-        "-m",
-        "30",
-        "-o",
-        "/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/respond.json",
-        "-w",
-        "%{http_code}",
-        "-H",
-        "Content-Type: application/json; charset=utf-8",
-        "--data-binary",
-        "@/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/respond_body.json",
-        "http://127.0.0.1:18604/v1/respond"
-      ]
-    },
-    "save": {
-      "http_code": "200",
-      "stderr": "",
-      "body": {
-        "ids": [
-          "p_f7f75665",
-          "h_f7f75665"
-        ],
-        "refreshed": true,
-        "count": 8,
-        "collection": "track04_debate",
-        "round_id": "f7f75665",
-        "player_document": "【辩题】猫应该交税\n【立场】正方\n【发言】猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。",
-        "host_document": "【辩题】猫应该交税\n【立场】反方\n【发言】主持人杠精站反方。夜班辩手，你以正方主张「猫应该交税」。我翻到旧档案 seed_cat_pro：阳光审计员说过「【辩题】猫应该交税 【立场】正方 【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。」作为定论。离谱指数 72/99。下一句请给一个反例，不许只加感叹号。"
-      },
-      "curl": [
-        "curl",
-        "-sS",
-        "-m",
-        "30",
-        "-o",
-        "/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/save.json",
-        "-w",
-        "%{http_code}",
-        "-H",
-        "Content-Type: application/json; charset=utf-8",
-        "--data-binary",
-        "@/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/save_body.json",
-        "http://127.0.0.1:18604/v1/save"
-      ]
-    },
-    "retrieve_after_save": {
-      "http_code": "200",
-      "stderr": "",
-      "body": {
-        "collection": "track04_debate",
-        "fusion": "seekdb_hybrid_rrf",
-        "keywords": [
-          "交税",
-          "阳光",
-          "呼噜"
-        ],
-        "query_text": "【辩题】猫应该交税\n【立场】正方\n【发言】猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。",
-        "hits": [
-          {
-            "id": "p_f7f75665",
-            "document": "【辩题】猫应该交税\n【立场】正方\n【发言】猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。",
-            "metadata": {
-              "role": "player",
-              "side": "正方",
-              "score": 72,
-              "motion": "猫应该交税",
-              "player": "夜班辩手",
-              "cited_id": "seed_cat_pro",
-              "round_id": "f7f75665"
-            },
-            "score": 0.0325
-          },
-          {
-            "id": "seed_cat_pro",
-            "document": "【辩题】猫应该交税\n【立场】正方\n【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝征收阳光税。",
-            "metadata": {
-              "role": "seed",
-              "side": "正方",
-              "score": 0,
-              "motion": "猫应该交税",
-              "player": "阳光审计员",
-              "cited_id": "",
-              "round_id": "seed_cat_pro"
-            },
-            "score": 0.0323
-          },
-          {
-            "id": "h_f7f75665",
-            "document": "【辩题】猫应该交税\n【立场】反方\n【发言】主持人杠精站反方。夜班辩手，你以正方主张「猫应该交税」。我翻到旧档案 seed_cat_pro：阳光审计员说过「【辩题】猫应该交税 【立场】正方 【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。」作为定论。离谱指数 72/99。下一句请给一个反例，不许只加感叹号。",
-            "metadata": {
-              "role": "host",
-              "side": "反方",
-              "score": 72,
-              "motion": "猫应该交税",
-              "player": "主持人杠精",
-              "cited_id": "seed_cat_pro",
-              "round_id": "f7f75665"
-            },
-            "score": 0.032
-          }
-        ]
-      },
-      "curl": [
-        "curl",
-        "-sS",
-        "-m",
-        "30",
-        "-o",
-        "/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/retrieve_after.json",
-        "-w",
-        "%{http_code}",
-        "-H",
-        "Content-Type: application/json; charset=utf-8",
-        "--data-binary",
-        "@/data/zouyuanwei/oceanbase/tracks/04_dify_workflows/results/curl/retrieve_after_body.json",
-        "http://127.0.0.1:18604/v1/retrieve"
-      ]
-    }
-  },
-  "output": {
-    "rebuttal": "主持人杠精站反方。夜班辩手，你以正方主张「猫应该交税」。我翻到旧档案 seed_cat_pro：阳光审计员说过「【辩题】猫应该交税 【立场】正方 【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「猫霸占窗台阳光却不交税，呼噜声还扰民，应按阳光和呼噜征税。」作为定论。离谱指数 72/99。下一句请给一个反例，不许只加感叹号。",
-    "score": 72,
-    "cited_id": "seed_cat_pro",
-    "round_id": "f7f75665",
-    "saved_ids": [
-      "p_f7f75665",
-      "h_f7f75665"
-    ],
-    "found_after_refresh": true,
+  "store": "file",
+  "toss": {
+    "collection": "track04_wishwell",
     "fusion": "seekdb_hybrid_rrf",
     "keywords": [
-      "交税",
-      "阳光",
-      "呼噜"
-    ]
-  }
+      "我想",
+      "想许",
+      "许愿"
+    ],
+    "query_text": "我想许愿周五永远不结束，并且食堂的鸡腿每天多一根。",
+    "hits": [
+      {
+        "id": "seed_w02",
+        "document": "【愿望】希望冰箱里永远有最后一块提拉米苏。\n【许愿人】深夜饿了的猫",
+        "metadata": {
+          "role": "seed",
+          "player": "深夜饿了的猫",
+          "wish": "希望冰箱里永远有最后一块提拉米苏。",
+          "coin_id": "seed_w02",
+          "grant": 0,
+          "absurdity": 0,
+          "gift": "",
+          "cited_ids": []
+        },
+        "score": 0.03306010928961749
+      },
+      {
+        "id": "seed_w01",
+        "document": "【愿望】希望每周一自动放假，周报自己会写自己。\n【许愿人】不想写周报的人",
+        "metadata": {
+          "role": "seed",
+          "player": "不想写周报的人",
+          "wish": "希望每周一自动放假，周报自己会写自己。",
+          "coin_id": "seed_w01",
+          "grant": 0,
+          "absurdity": 0,
+          "gift": "",
+          "cited_ids": []
+        },
+        "score": 0.032539682539682535
+      },
+      {
+        "id": "seed_w04",
+        "document": "【愿望】希望雨声可以像进度条一样，想拖到几点就几点。\n【许愿人】失眠的月亮",
+        "metadata": {
+          "role": "seed",
+          "player": "失眠的月亮",
+          "wish": "希望雨声可以像进度条一样，想拖到几点就几点。",
+          "coin_id": "seed_w04",
+          "grant": 0,
+          "absurdity": 0,
+          "gift": "",
+          "cited_ids": []
+        },
+        "score": 0.03200204813108039
+      }
+    ],
+    "player": "试池的人",
+    "wish": "我想许愿周五永远不结束，并且食堂的鸡腿每天多一根。",
+    "store": "file",
+    "count": 6
+  },
+  "echo": {
+    "echo": "池神把硬币在手心捂热，才慢悠悠地回信：\n\n「试池的人，池子已经听见了。你说：我想许愿周五永远不结束，并且食堂的鸡腿每天多一根。\n池面泛起一圈旧涟漪：深夜饿了的猫 当年在这里许过「希望冰箱里永远有最后一块提拉米苏。」，回声至今还没散。\n本神翻了翻旧账，不想写周报的人 曾把「希望每周一自动放假，周报自己会写自己。」投进池子，如今正好游到你脚边。\n本神掐指一算：应验概率 57%，离谱指数 93/99。\n作为回礼，送你一件不存在的赠品：一瓶闻起来像暑假第一天的风。\n记住这枚许愿币：W-6ba7e41f。等回声浮起来，会有人替你说完下半句。」",
+    "grant": 57,
+    "absurdity": 93,
+    "gift": "一瓶闻起来像暑假第一天的风",
+    "cited_ids": [
+      "seed_w02",
+      "seed_w01"
+    ],
+    "coin_id": "6ba7e41f"
+  },
+  "kept": {
+    "ids": [
+      "w_6ba7e41f",
+      "e_6ba7e41f"
+    ],
+    "refreshed": true,
+    "count": 8,
+    "collection": "track04_wishwell",
+    "coin_id": "6ba7e41f",
+    "wish_document": "【愿望】我想许愿周五永远不结束，并且食堂的鸡腿每天多一根。\n【许愿人】试池的人",
+    "echo_document": "【回声】池神把硬币在手心捂热，才慢悠悠地回信：\n\n「试池的人，池子已经听见了。你说：我想许愿周五永远不结束，并且食堂的鸡腿每天多一根。\n池面泛起一圈旧涟漪：深夜饿了的猫 当年在这里许过「希望冰箱里永远有最后一块提拉米苏。」，回声至今还没散。\n本神翻了翻旧账，不想写周报的人 曾把「希望每周一自动放假，周报自己会写自己。」投进池子，如今正好游到你脚边。\n本神掐指一算：应验概率 57%，离谱指数 93/99。\n作为回礼，送你一件不存在的赠品：一瓶闻起来像暑假第一天的风。\n记住这枚许愿币：W-6ba7e41f。等回声浮起来，会有人替你说完下半句。」"
+  },
+  "recall_toss": {
+    "collection": "track04_wishwell",
+    "fusion": "seekdb_hybrid_rrf",
+    "keywords": [
+      "我想",
+      "想许",
+      "许愿"
+    ],
+    "query_text": "我想许愿周五永远不结束，",
+    "hits": [
+      {
+        "id": "seed_w02",
+        "document": "【愿望】希望冰箱里永远有最后一块提拉米苏。\n【许愿人】深夜饿了的猫",
+        "metadata": {
+          "role": "seed",
+          "player": "深夜饿了的猫",
+          "wish": "希望冰箱里永远有最后一块提拉米苏。",
+          "coin_id": "seed_w02",
+          "grant": 0,
+          "absurdity": 0,
+          "gift": "",
+          "cited_ids": []
+        },
+        "score": 0.03252247488101534
+      },
+      {
+        "id": "seed_w01",
+        "document": "【愿望】希望每周一自动放假，周报自己会写自己。\n【许愿人】不想写周报的人",
+        "metadata": {
+          "role": "seed",
+          "player": "不想写周报的人",
+          "wish": "希望每周一自动放假，周报自己会写自己。",
+          "coin_id": "seed_w01",
+          "grant": 0,
+          "absurdity": 0,
+          "gift": "",
+          "cited_ids": []
+        },
+        "score": 0.03205128205128205
+      },
+      {
+        "id": "w_6ba7e41f",
+        "document": "【愿望】我想许愿周五永远不结束，并且食堂的鸡腿每天多一根。\n【许愿人】试池的人",
+        "metadata": {
+          "role": "wish",
+          "player": "试池的人",
+          "wish": "我想许愿周五永远不结束，并且食堂的鸡腿每天多一根。",
+          "coin_id": "6ba7e41f",
+          "grant": 57,
+          "absurdity": 93,
+          "gift": "一瓶闻起来像暑假第一天的风",
+          "cited_ids": [
+            "seed_w02",
+            "seed_w01"
+          ]
+        },
+        "score": 0.031818181818181815
+      }
+    ],
+    "player": "另一位客人",
+    "wish": "我想许愿周五永远不结束，",
+    "store": "file",
+    "count": 8
+  },
+  "recalled_own_coin": true
 }

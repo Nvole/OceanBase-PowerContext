@@ -1,4 +1,11 @@
-"""64-dimensional feature hashing. Pure Python, no model weights."""
+"""64-dimensional feature hashing for wish texts. Pure stdlib, no model weights.
+
+The same text always maps to the same unit vector, so retrieval is reproducible
+without any embedding model. The approach (feature-hash Chinese text into a
+64-dim unit vector for seekdb hybrid search) follows the reference
+implementation shipped in this repository's debate track; the constants and
+tokenisation below are written for this project.
+"""
 import hashlib
 import math
 import re

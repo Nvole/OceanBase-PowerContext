@@ -1,4 +1,4 @@
-"""Debate HTTP service. It listens only on 127.0.0.1:18604."""
+"""Wishwell HTTP service. It listens only on 127.0.0.1:18604."""
 import json
 import re
 import sys
@@ -8,18 +8,20 @@ from pathlib import Path
 SRC = Path(__file__).resolve().parent
 sys.path.insert(0, str(SRC))
 
-from debate import COLLECTION, SEED_FILE, ensure_ready, hybrid_hits, save_round
-from respond import host_reply, round_id_for
+from poolgod import coin_id_for  # noqa: E402
+from wishwell import COLLECTION, SEED_FILE, ensure_ready, hybrid_hits, save_wish, store_name  # noqa: E402
 
 HOST = "127.0.0.1"
 PORT = 18604
-ROUND_ID = re.compile(r"[A-Za-z0-9_]{4,40}")
+COIN_ID = re.compile(r"[A-Za-z0-9_]{4,40}")
 COLLECTION_HANDLE = None
+STORE = None
 
 
 def ready():
-    global COLLECTION_HANDLE
-    if not Path(SEED_FILE).parents[1].joinpath(".env").exists() and not (SRC.parent / ".env").exists():
+    global COLLECTION_HANDLE, STORE
+    STORE = store_name()
+    if STORE == "seekdb" and not (SRC.parent / ".env").exists():
         raise SystemExit("missing track .env; refusing to start")
     COLLECTION_HANDLE = ensure_ready()
 
@@ -56,8 +58,8 @@ class Handler(BaseHTTPRequestHandler):
             message = f"{message}: {detail[:300]}"
         self._send(500, {"error": message})
 
-    def _text(self, payload, key, limit, required=True):
-        value = payload.get(key, "")
+    def _text(self, payload, key, limit, required=True, default=""):
+        value = payload.get(key, default)
         if not isinstance(value, str):
             raise ValueError(f"{key} must be a string")
         value = value.strip()
@@ -67,16 +69,16 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError(f"{key} is too long")
         return value
 
-    def _side(self, payload):
-        side = self._text(payload, "side", 8)
-        if side not in ("正方", "反方"):
-            raise ValueError("side must be 正方 or 反方")
-        return side
-
     def _n_results(self, payload):
         value = payload.get("n_results", 3)
         if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 8:
             raise ValueError("n_results must be an integer from 1 to 8")
+        return value
+
+    def _percent(self, payload, key):
+        value = payload.get(key)
+        if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 99:
+            raise ValueError(f"{key} must be an integer from 1 to 99")
         return value
 
     def do_GET(self):
@@ -86,17 +88,19 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(200, {
                     "ok": True,
                     "bind": f"{HOST}:{PORT}",
+                    "store": STORE,
                     "collection": COLLECTION,
                     "count": COLLECTION_HANDLE.count(),
                 })
                 return
-            if path == "/v1/motions":
+            if path == "/v1/pond":
                 seeds = json.loads(SEED_FILE.read_text(encoding="utf-8"))
-                motions = []
-                for seed in seeds:
-                    if seed["motion"] not in motions:
-                        motions.append(seed["motion"])
-                self._send(200, {"motions": motions})
+                self._send(200, {
+                    "store": STORE,
+                    "collection": COLLECTION,
+                    "count": COLLECTION_HANDLE.count(),
+                    "seeds": [{"id": seed["id"], "player": seed["player"], "wish": seed["wish"]} for seed in seeds],
+                })
                 return
             self._send(404, {"error": "not found"})
         except Exception as exc:
@@ -106,12 +110,10 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0]
         try:
             payload = self._read()
-            if path == "/v1/retrieve":
-                self._send(200, self._retrieve(payload))
-            elif path == "/v1/respond":
-                self._send(200, self._respond(payload))
-            elif path == "/v1/save":
-                self._send(200, self._save(payload))
+            if path == "/v1/toss":
+                self._send(200, self._toss(payload))
+            elif path == "/v1/keep":
+                self._send(200, self._keep(payload))
             else:
                 self._send(404, {"error": "not found"})
         except ValueError as exc:
@@ -119,47 +121,38 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             self._fail(exc)
 
-    def _retrieve(self, payload):
-        if "text" in payload:
-            text = self._text(payload, "text", 800)
-        else:
-            text = self._text(payload, "argument", 800)
-        motion = self._text(payload, "motion", 40, required=False) if "motion" in payload else ""
-        return hybrid_hits(COLLECTION_HANDLE, text, motion=motion, n_results=self._n_results(payload))
+    def _toss(self, payload):
+        player = self._text(payload, "player", 24, required=False, default="无名路人") or "无名路人"
+        wish = self._text(payload, "wish", 200)
+        result = hybrid_hits(COLLECTION_HANDLE, wish, n_results=self._n_results(payload))
+        result.update({
+            "player": player,
+            "wish": wish,
+            "store": STORE,
+            "count": COLLECTION_HANDLE.count(),
+        })
+        return result
 
-    def _respond(self, payload):
-        player = self._text(payload, "player", 24)
-        motion = self._text(payload, "motion", 40)
-        side = self._side(payload)
-        argument = self._text(payload, "argument", 240)
-        hits = payload.get("hits") or []
-        if not isinstance(hits, list):
-            raise ValueError("hits must be a list")
-        reply = host_reply(player, motion, side, argument, hits)
-        reply.update({"player": player, "motion": motion, "side": side, "argument": argument})
-        return reply
-
-    def _save(self, payload):
-        player = self._text(payload, "player", 24)
-        motion = self._text(payload, "motion", 40)
-        side = self._side(payload)
-        argument = self._text(payload, "argument", 240)
-        rebuttal = self._text(payload, "rebuttal", 800)
-        host_side = self._text(payload, "host_side", 8)
-        if host_side not in ("正方", "反方"):
-            raise ValueError("host_side must be 正方 or 反方")
-        score = payload.get("score")
-        if isinstance(score, bool) or not isinstance(score, int) or not 1 <= score <= 99:
-            raise ValueError("score must be an integer from 1 to 99")
-        cited_id = payload.get("cited_id") or ""
-        if not isinstance(cited_id, str) or len(cited_id) > 40:
-            raise ValueError("cited_id is invalid")
-        round_id = payload.get("round_id") or round_id_for(player, motion, argument)
-        if not isinstance(round_id, str) or not ROUND_ID.fullmatch(round_id):
-            raise ValueError("round_id is invalid")
-        return save_round(
-            COLLECTION_HANDLE, player, motion, side, argument, rebuttal,
-            score, cited_id, round_id, host_side)
+    def _keep(self, payload):
+        player = self._text(payload, "player", 24, required=False, default="无名路人") or "无名路人"
+        wish = self._text(payload, "wish", 200)
+        echo = self._text(payload, "echo", 800)
+        grant = self._percent(payload, "grant")
+        absurdity = self._percent(payload, "absurdity")
+        gift = self._text(payload, "gift", 40, required=False, default="")
+        cited_ids = payload.get("cited_ids") or []
+        if not isinstance(cited_ids, list):
+            raise ValueError("cited_ids must be a list")
+        cleaned = [str(item) for item in cited_ids[:8]]
+        for item in cleaned:
+            if len(item) > 40:
+                raise ValueError("cited_ids contains an invalid id")
+        coin_id = payload.get("coin_id") or coin_id_for(player, wish)
+        if not isinstance(coin_id, str) or not COIN_ID.fullmatch(coin_id):
+            raise ValueError("coin_id is invalid")
+        return save_wish(
+            COLLECTION_HANDLE, player, wish, echo, grant, absurdity,
+            gift, cleaned, coin_id)
 
 
 def main():
@@ -168,7 +161,7 @@ def main():
     bound_host, bound_port = server.server_address[:2]
     if bound_host != HOST or bound_port != PORT:
         raise RuntimeError("refusing to bind any address other than 127.0.0.1:18604")
-    print(f"listening http://{HOST}:{PORT}", flush=True)
+    print(f"listening http://{HOST}:{PORT} (store={STORE})", flush=True)
     server.serve_forever()
 
 

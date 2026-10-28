@@ -1,7 +1,0 @@
-listening http://127.0.0.1:18604
-GET /health
-POST /v1/retrieve
-POST /v1/respond
-POST /v1/save
-POST /v1/retrieve
-GET /health

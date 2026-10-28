@@ -1,0 +1,162 @@
+{
+  "path": "C:\\Users\\xujin\\Documents\\Codex\\2026-10-27\\just-for-fun-dify-90-5\\work\\submission\\wishwell-dify\\docs\\wishwell.dsl.yml",
+  "checks": [
+    {
+      "name": "yaml_parses",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "kind",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "app_mode",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "node_chain",
+      "passed": true,
+      "detail": "['start', 'http-request', 'llm', 'code', 'http-request', 'end']"
+    },
+    {
+      "name": "six_nodes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "edge_ok_1733000101_1733000102",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "edge_ok_1733000102_1733000103",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "edge_ok_1733000103_1733000104",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "edge_ok_1733000104_1733000105",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "edge_ok_1733000105_1733000106",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "env_api_base",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "start_vars",
+      "passed": true,
+      "detail": "['player', 'wish']"
+    },
+    {
+      "name": "wish_required",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "toss_url",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "toss_json_single_item",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "toss_body_fields",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "llm_model",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "llm_prompt_roles",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "llm_prompt_json_contract",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "llm_context_off",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "code_compiles",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "code_output_echo",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "code_output_grant",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "code_output_absurdity",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "code_output_gift",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "code_output_coin_id",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "code_output_save_body",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "keep_url",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "keep_raw_text",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "end_outputs",
+      "passed": true,
+      "detail": "6"
+    },
+    {
+      "name": "no_secrets",
+      "passed": true,
+      "detail": "[]"
+    }
+  ],
+  "passed": 31,
+  "total": 31
+}
