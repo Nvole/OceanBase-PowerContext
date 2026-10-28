@@ -1,0 +1,4 @@
+.env
+data/wishwell-store.json
+__pycache__/
+*.pyc

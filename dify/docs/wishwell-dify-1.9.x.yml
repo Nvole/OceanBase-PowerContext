@@ -1,0 +1,410 @@
+app:
+  description: "向池子投一枚离谱愿望，池神会翻出 seekdb 里的旧愿望给你写一封回声信。"
+  icon: "🪙"
+  icon_background: "#FFF4E5"
+  mode: workflow
+  name: "离谱许愿池"
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: app
+version: "0.3.1"
+workflow:
+  conversation_variables: []
+  environment_variables:
+    - id: "b7c1a2e0-4d55-41d0-9a11-04d1f4e00001"
+      name: WISH_API_BASE
+      value: "http://127.0.0.1:18604"
+      value_type: string
+      description: "许愿池 HTTP 服务。只在能访问该回环地址的机器上使用。"
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ""
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+  graph:
+    edges:
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: start
+          targetType: http-request
+        id: "1733000101-source-1733000102-target"
+        source: "1733000101"
+        sourceHandle: source
+        target: "1733000102"
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: http-request
+          targetType: llm
+        id: "1733000102-source-1733000103-target"
+        source: "1733000102"
+        sourceHandle: source
+        target: "1733000103"
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: llm
+          targetType: code
+        id: "1733000103-source-1733000104-target"
+        source: "1733000103"
+        sourceHandle: source
+        target: "1733000104"
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: code
+          targetType: http-request
+        id: "1733000104-source-1733000105-target"
+        source: "1733000104"
+        sourceHandle: source
+        target: "1733000105"
+        targetHandle: target
+        type: custom
+        zIndex: 0
+      - data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: http-request
+          targetType: end
+        id: "1733000105-source-1733000106-target"
+        source: "1733000105"
+        sourceHandle: source
+        target: "1733000106"
+        targetHandle: target
+        type: custom
+        zIndex: 0
+    nodes:
+      - data:
+          desc: "玩家留下昵称和一个愿望。"
+          selected: false
+          title: 输入
+          type: start
+          variables:
+            - label: 许愿人
+              max_length: 24
+              options: []
+              required: false
+              type: text-input
+              variable: player
+            - label: 愿望
+              max_length: 200
+              options: []
+              required: true
+              type: paragraph
+              variable: wish
+        height: 170
+        id: "1733000101"
+        position:
+          x: 80
+          y: 220
+        positionAbsolute:
+          x: 80
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          authorization:
+            config: null
+            type: no-auth
+          body:
+            data:
+              - key: ""
+                type: text
+                value: '{"player": "{{#1733000101.player#}}", "wish": "{{#1733000101.wish#}}", "n_results": 3}'
+            type: json
+          desc: "调用本机服务，让 seekdb hybrid_search 检索池中旧愿望。"
+          headers: "Content-Type: application/json"
+          method: post
+          params: ""
+          selected: false
+          ssl_verify: true
+          timeout:
+            connect: 10
+            read: 30
+            write: 30
+          title: HTTP 投币
+          type: http-request
+          url: "{{#env.WISH_API_BASE#}}/v1/toss"
+        height: 140
+        id: "1733000102"
+        position:
+          x: 380
+          y: 220
+        positionAbsolute:
+          x: 380
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          context:
+            enabled: false
+            variable_selector: []
+          desc: "池神读旧涟漪，写回声信；只输出一个 JSON 对象。"
+          model:
+            completion_params: {}
+            mode: chat
+            name: gpt-4o-mini
+            provider: langgenius/openai/openai
+          prompt_template:
+            - id: "1733000103-prompt-1"
+              role: system
+              text: |
+                你是「离谱许愿池」的池神，一尊住在废弃喷泉里的 AI 神祇。收到凡人的愿望后，先翻阅池中旧愿望，再写一封温柔又离谱的回声信。
+                规则：
+                1. 必须引用至少一条旧愿望（说出许愿人和愿望内容），让新旧愿望产生回声；池中没有旧愿望时，就说池面平静。
+                2. 给出应验概率 grant（1-99 的整数）和离谱指数 absurdity（1-99 的整数），并送一件不存在的赠品 gift（20 字以内）。
+                3. 许愿币编号 coin_id 用 8 位十六进制；如果检索结果里没有可用编号，就用 00000000。
+                4. cited_ids 填你引用的旧愿望 id 数组。
+                5. 只输出一个 JSON 对象，不要任何多余文字。字段：echo（回声信全文，可含换行）、grant、absurdity、gift、cited_ids、coin_id。
+            - id: "1733000103-prompt-2"
+              role: user
+              text: |
+                新愿望
+                许愿人：{{#1733000101.player#}}
+                愿望：{{#1733000101.wish#}}
+
+                池中旧涟漪（seekdb hybrid_search 结果）：
+                {{#1733000102.body#}}
+          selected: false
+          title: 池神
+          type: llm
+          variables: []
+          vision:
+            enabled: false
+        height: 160
+        id: "1733000103"
+        position:
+          x: 680
+          y: 220
+        positionAbsolute:
+          x: 680
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          code: |
+            def main(player: str, wish: str, toss_body: str, god_text: str) -> dict:
+                import json
+                import re
+                if isinstance(toss_body, dict):
+                    toss = toss_body
+                else:
+                    toss = json.loads(toss_body or "{}")
+                hits = toss.get("hits") or []
+                fallback_cited = [str(hit.get("id") or "") for hit in hits[:2] if hit.get("id")]
+                god_text = god_text or "{}"
+                payload = None
+                match = re.search(r"\{[\s\S]*\}", god_text)
+                if match:
+                    try:
+                        payload = json.loads(match.group(0))
+                    except Exception:
+                        payload = None
+                if not isinstance(payload, dict):
+                    payload = {}
+                echo = str(payload.get("echo") or "").strip()[:800]
+                grant = payload.get("grant")
+                absurdity = payload.get("absurdity")
+                if isinstance(grant, bool) or not isinstance(grant, int) or not 1 <= grant <= 99:
+                    grant = 42
+                if isinstance(absurdity, bool) or not isinstance(absurdity, int) or not 1 <= absurdity <= 99:
+                    absurdity = 42
+                gift = str(payload.get("gift") or "").strip()[:40]
+                cited_ids = payload.get("cited_ids") or fallback_cited
+                if not isinstance(cited_ids, list):
+                    cited_ids = fallback_cited
+                cited_ids = [str(item)[:40] for item in cited_ids[:8]]
+                coin = str(payload.get("coin_id") or "").strip()
+                if not re.fullmatch(r"[0-9a-fA-F]{4,40}", coin):
+                    value = 2166136261
+                    for byte in f"{player}|{wish}".encode("utf-8"):
+                        value ^= byte
+                        value = (value * 16777619) & 0xFFFFFFFF
+                    coin = f"{value:08x}"
+                save_body = json.dumps({
+                    "player": player,
+                    "wish": wish,
+                    "echo": echo,
+                    "grant": grant,
+                    "absurdity": absurdity,
+                    "gift": gift,
+                    "cited_ids": cited_ids,
+                    "coin_id": coin,
+                }, ensure_ascii=False)
+                return {
+                    "echo": echo,
+                    "grant": grant,
+                    "absurdity": absurdity,
+                    "gift": gift,
+                    "cited_ids": cited_ids,
+                    "coin_id": coin,
+                    "save_body": save_body,
+                }
+          code_language: python3
+          desc: "把池神回信整理成许愿币并拼好入池请求。"
+          outputs:
+            absurdity:
+              type: number
+            cited_ids:
+              type: array[string]
+            coin_id:
+              type: string
+            echo:
+              type: string
+            gift:
+              type: string
+            grant:
+              type: number
+            save_body:
+              type: string
+          selected: false
+          title: 制币
+          type: code
+          variables:
+            - value_selector:
+                - "1733000101"
+                - player
+              variable: player
+            - value_selector:
+                - "1733000101"
+                - wish
+              variable: wish
+            - value_selector:
+                - "1733000102"
+                - body
+              variable: toss_body
+            - value_selector:
+                - "1733000103"
+                - text
+              variable: god_text
+        height: 160
+        id: "1733000104"
+        position:
+          x: 980
+          y: 220
+        positionAbsolute:
+          x: 980
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          authorization:
+            config: null
+            type: no-auth
+          body:
+            data:
+              - key: ""
+                type: text
+                value: "{{#1733000104.save_body#}}"
+            type: raw-text
+          desc: "把愿望和回声写进 seekdb，服务端会 refresh_index。"
+          headers: "Content-Type: application/json"
+          method: post
+          params: ""
+          selected: false
+          ssl_verify: true
+          timeout:
+            connect: 10
+            read: 30
+            write: 30
+          title: HTTP 入池
+          type: http-request
+          url: "{{#env.WISH_API_BASE#}}/v1/keep"
+        height: 140
+        id: "1733000105"
+        position:
+          x: 1280
+          y: 220
+        positionAbsolute:
+          x: 1280
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+      - data:
+          desc: "把回声信和许愿币交给许愿人。"
+          outputs:
+            - value_selector:
+                - "1733000104"
+                - echo
+              value_type: string
+              variable: echo
+            - value_selector:
+                - "1733000104"
+                - grant
+              value_type: number
+              variable: grant
+            - value_selector:
+                - "1733000104"
+                - absurdity
+              value_type: number
+              variable: absurdity
+            - value_selector:
+                - "1733000104"
+                - gift
+              value_type: string
+              variable: gift
+            - value_selector:
+                - "1733000104"
+                - coin_id
+              value_type: string
+              variable: coin_id
+            - value_selector:
+                - "1733000105"
+                - body
+              value_type: string
+              variable: saved
+          selected: false
+          title: 输出
+          type: end
+        height: 150
+        id: "1733000106"
+        position:
+          x: 1580
+          y: 220
+        positionAbsolute:
+          x: 1580
+          y: 220
+        selected: false
+        sourcePosition: right
+        targetPosition: left
+        type: custom
+        width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.75

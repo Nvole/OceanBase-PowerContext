@@ -2,7 +2,7 @@
   "hash_vector": {
     "passed": true
   },
-  "host": {
+  "poolgod": {
     "passed": true
   },
   "source": {
@@ -18,9 +18,12 @@
     "passed": true
   },
   "real_hybrid": {
-    "passed": true
+    "skipped": "no seekdb server here"
   },
   "real_save": {
+    "skipped": "no seekdb server here"
+  },
+  "file_roundtrip": {
     "passed": true
   }
 }
