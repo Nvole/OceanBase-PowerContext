@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科研资料检索助手 - 项目展示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif; background: #f0f2f5; color: #333; line-height: 1.7; }
+        .hero { background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%); color: white; padding: 60px 20px; text-align: center; }
+        .hero h1 { font-size: 2.4em; margin-bottom: 12px; }
+        .hero p { font-size: 1.1em; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .card { background: white; border-radius: 12px; padding: 28px; margin: 24px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+        .card h2 { color: #1a73e8; margin-bottom: 16px; font-size: 1.4em; border-bottom: 2px solid #e8f0fe; padding-bottom: 8px; }
+        .card h3 { color: #333; margin: 16px 0 8px; font-size: 1.1em; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600; margin: 2px; }
+        .badge-pass { background: #e6f4ea; color: #137333; }
+        .badge-info { background: #e8f0fe; color: #1a73e8; }
+        .badge-warn { background: #fef7e0; color: #b06000; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 16px 0; }
+        .tech-item { background: #f8f9fa; padding: 16px; border-radius: 8px; text-align: center; }
+        .tech-item strong { display: block; color: #1a73e8; margin-bottom: 4px; }
+        .check-list { list-style: none; padding: 0; }
+        .check-list li { padding: 6px 0; padding-left: 24px; position: relative; }
+        .check-list li::before { content: "✅"; position: absolute; left: 0; }
+        .code-block { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-family: "Cascadia Code", "Fira Code", monospace; font-size: 0.85em; overflow-x: auto; margin: 12px 0; white-space: pre-wrap; }
+        .evidence-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        .evidence-table th, .evidence-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e1e8ed; }
+        .evidence-table th { background: #f8f9fa; font-weight: 600; color: #555; }
+        .disclaimer { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px; margin: 16px 0; }
+        .disclaimer strong { color: #856404; }
+        .screenshot-placeholder { background: #f8f9fa; border: 2px dashed #ccc; border-radius: 8px; padding: 40px; text-align: center; color: #999; margin: 12px 0; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0; }
+        .feature-item { padding: 16px; border: 1px solid #e1e8ed; border-radius: 8px; }
+        .feature-item h4 { color: #1a73e8; margin-bottom: 6px; }
+        footer { text-align: center; padding: 30px; color: #999; font-size: 0.85em; border-top: 1px solid #e1e8ed; margin-top: 30px; }
+        a { color: #1a73e8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>📚 科研资料检索助手</h1>
+        <p>基于 seekdb 的科研文档检索系统 — OceanBase 2026 竞赛作品</p>
+    </div>
+
+    <div class="container">
+        <!-- Project Overview -->
+        <div class="card">
+            <h2>项目简介</h2>
+            <p>论文阅读笔记、实验记录和组会待办分散在多个文件中，难以按关键词、资料类型和标签快速找到对应出处。本项目提供一个统一的文档管理和检索系统，支持导入 Markdown/TXT 文件，按关键词搜索并返回匹配段落和原文出处。</p>
+            
+            <h3>核心功能</h3>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <h4>📤 上传资料</h4>
+                    <p>支持 .md / .txt，自动解析标题、类型、标签和段落</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🔍 关键词检索</h4>
+                    <p>在标题、正文和标签中搜索，返回匹配段落</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🏷️ 类型/标签筛选</h4>
+                    <p>按 reading/experiment/todo 类型和自定义标签过滤</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🗑️ 管理操作</h4>
+                    <p>查看详情、删除文档，同名文件不覆盖</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="card">
+            <h2>技术架构</h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <strong>后端</strong>
+                    Python 3.13 + FastAPI
+                </div>
+                <div class="tech-item">
+                    <strong>数据库</strong>
+                    seekdb (MySQL协议)
+                </div>
+                <div class="tech-item">
+                    <strong>ORM</strong>
+                    SQLAlchemy 2.1.6
+                </div>
+                <div class="tech-item">
+                    <strong>驱动</strong>
+                    PyMySQL 1.2.3
+                </div>
+                <div class="tech-item">
+                    <strong>前端</strong>
+                    原生 HTML/CSS/JS
+                </div>
+                <div class="tech-item">
+                    <strong>开发工具</strong>
+                    Qoder IDE
+                </div>
+            </div>
+        </div>
+
+        <!-- seekdb Evidence -->
+        <div class="card">
+            <h2>seekdb 实际使用证据</h2>
+            
+            <p>以下验证在真实 seekdb 实例上完成（2026-10-28），数据库名 <code>qoder_research</code>，未修改 <code>competition_practice</code> 或其他项目数据。</p>
+            
+            <table class="evidence-table">
+                <tr><th>项目</th><th>详情</th></tr>
+                <tr><td>seekdb 版本</td><td><span class="badge badge-info">5.7.25-OceanBase seekdb-v1.4.0.0</span></td></tr>
+                <tr><td>连接方式</td><td>SQLAlchemy + PyMySQL，MySQL 协议</td></tr>
+                <tr><td>URL 构造</td><td><code>URL.create("mysql+pymysql", ...)</code> 安全构造</td></tr>
+                <tr><td>检索方式</td><td><span class="badge badge-warn">关键词 LIKE 子串匹配</span>（非向量检索）</td></tr>
+            </table>
+
+            <h3>19 项真实浏览器与 seekdb 检查（全部通过）</h3>
+            <p>2026-10-28 20:57 验收：Chromium 上传、检索、类型/标签/中文筛选、详情、同名保留、XSS、SQL 注入、删除、无 JS 错误及 seekdb 服务重启后持久化均通过。验收资料已清理，原有资料保留；证据为交付包中的 browser_acceptance.json 和浏览器截图。</p>
+            <ul class="check-list">
+                <li>首页渲染正常</li>
+                <li>seekdb 后端确认</li>
+                <li>上传阅读笔记 (reading)</li>
+                <li>上传实验记录 (experiment)</li>
+                <li>上传待办事项 (todo)</li>
+                <li>关键词搜索返回正确资料</li>
+                <li>类型筛选正确</li>
+                <li>中文查询正常</li>
+                <li>同名文件分配不同 ID</li>
+                <li>数据库直接行计数验证</li>
+                <li>删除后检索结果变化（由数据库状态决定）</li>
+            </ul>
+
+            <h3>参数化查询模板（不含密码）</h3>
+            <div class="code-block">SELECT * FROM documents 
+WHERE (title LIKE :keyword OR content LIKE :keyword OR tags LIKE :keyword)
+  AND (:doc_type IS NULL OR doc_type = :doc_type)
+  AND (:tag IS NULL OR tags LIKE :tag)
+LIMIT :limit OFFSET :offset</div>
+
+            <h3>数据样例（脱敏）</h3>
+            <div class="code-block">ID: 2
+Title: 合成阅读笔记
+Type: reading
+Tags: literature
+Source: sample-reading.md
+Content: ANC_NOTE_731 shared_anchor ...</div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="card">
+            <h2>测试结果</h2>
+            
+            <h3>43 项自动化测试全部通过（2026-10-28）</h3>
+            <p>原 15 项 + Qoder 新增 25 项 + Codex 新增 3 项回归；统一使用临时 SQLite，避免接触实际业务数据库。另有 19 项真实浏览器/seekdb 检查，含服务重启后持久化。</p>
+            <h3>其中：Qoder 新增隔离测试</h3>
+            <p>使用独立临时 SQLite，不影响实际数据库。<strong>25 项全部通过。</strong></p>
+            <ul class="check-list">
+                <li>首页回归 (6): 状态码、标题、搜索 UI、上传 UI、模式显示、静态文件</li>
+                <li>XSS 安全 (5): script 标签、搜索转义、img onerror、事件注入、js URL</li>
+                <li>SQL 注入 (6): 关键词注入、DROP TABLE、分号、UNION、类型/标签参数</li>
+                <li>上传安全 (4): 拒绝 exe/py/html、接受 txt、拒绝非 UTF-8</li>
+                <li>核心功能 (4): 上传检索、类型匹配、删除影响、健康检查</li>
+            </ul>
+
+            <h3>原单元测试（2026-10-27，Qoder 编写）</h3>
+            <p>15 项测试通过，覆盖搜索、筛选、删除、注入防护等核心场景。</p>
+        </div>
+
+        <!-- How to Run -->
+        <div class="card">
+            <h2>本地复现</h2>
+            
+            <h3>1. 安装依赖</h3>
+            <div class="code-block">pip install -r requirements.txt</div>
+            
+            <h3>2. 选择数据库</h3>
+            <p>SQLite 可直接启动。真实 seekdb 使用显式连接 JSON（自备 host/port/user/password，勿提交凭据）或进程环境变量；项目不自动读取 .env。</p>
+            
+            <h3>3. 导入样例 & 启动</h3>
+            <div class="code-block">python scripts/run.py --sqlite --import-examples
+# 或连接自备 seekdb（固定独立数据库 qoder_research）
+python scripts/run.py --connection-file .local/connection.json --import-examples</div>
+            <p><strong>托管边界：</strong>本网站是公开静态作品展示，不是在线 FastAPI 业务服务；数据库与业务 API 须按说明本地独立运行。</p>
+            
+            <h3>4. 运行测试</h3>
+            <div class="code-block"># 隔离测试（不影响实际数据库）
+python -m pytest tests -q -p no:cacheprovider</div>
+        </div>
+
+        <!-- Code Repository -->
+        <div class="card">
+            <h2>代码获取</h2>
+            <p>GitHub 由同队队友按赛事认可的协作流程提交，仓库地址与 commit 在提交后补充；当前不虚构仓库链接，不直接推送官方 origin。</p>
+            <p>项目资产在 <code>qoder/</code> 目录下，包含完整源码、测试、样例和文档。</p>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="card">
+            <h2>声明</h2>
+            <div class="disclaimer">
+                <strong>重要说明：</strong>
+                <ul style="margin-top: 8px; padding-left: 20px;">
+                    <li>本项目检索方式为<strong>关键词 LIKE 子串匹配</strong>，不宣称向量检索或混合检索能力</li>
+                    <li>所有样例均为<strong>合成内容</strong>，不代表真实论文结论、实验数据或使用效果</li>
+                    <li>未测量或宣称真实用户提效数据、访问量统计</li>
+                    <li>页面不包含任何私有源码、数据库密码、API Key 或个人资料</li>
+                    <li>seekdb 连接通过显式 JSON 或进程环境变量配置，真实凭据不随源码交付</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Development Attribution -->
+        <div class="card">
+            <h2>开发分工</h2>
+            <table class="evidence-table">
+                <tr><th>时间</th><th>工具</th><th>内容</th></tr>
+                <tr><td>2026-10-27</td><td><span class="badge badge-info">Qoder</span></td><td>核心功能：schema、API、前端、样例、15 项测试</td></tr>
+                <tr><td>2026-10-28</td><td><span class="badge badge-info">Codex</span></td><td>首页/连接修复、安全测试隔离、3 项回归、43 项全量测试、19 项 Chromium/真实 seekdb 验收（含服务重启）及交付整理</td></tr>
+                <tr><td>2026-10-28</td><td><span class="badge badge-info">Qoder</span></td><td>25 项隔离测试、文档更新、展示页制作</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>科研资料检索助手 v1.0 | OceanBase 2026 竞赛作品 | 基于 seekdb 关键词检索</p>
+        <p style="margin-top: 8px;">所有样例为合成内容 | 不宣称向量检索/用户提效/访问量</p>
+    </footer>
+</body>
+</html>

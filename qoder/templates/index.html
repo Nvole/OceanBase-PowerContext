@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科研资料检索助手</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 科研资料检索助手</h1>
+            <p class="subtitle">基于 seekdb 的文档检索系统 | 数据库: {{ db_mode }}</p>
+        </header>
+
+        <main>
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="输入关键词搜索..." autocomplete="off">
+                    <button onclick="searchDocuments()" class="btn-primary">搜索</button>
+                </div>
+                <div class="filters">
+                    <select id="typeFilter" onchange="searchDocuments()">
+                        <option value="">全部类型</option>
+                        <option value="reading">阅读笔记</option>
+                        <option value="experiment">实验记录</option>
+                        <option value="todo">待办事项</option>
+                    </select>
+                    <input type="text" id="tagFilter" placeholder="标签筛选..." onchange="searchDocuments()">
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <h2>上传资料</h2>
+                <div class="upload-area" id="dropZone">
+                    <input type="file" id="fileInput" accept=".md,.txt" multiple>
+                    <p>拖拽文件到此处或点击选择 (.md / .txt)</p>
+                </div>
+                <div id="uploadStatus"></div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <h2>检索结果</h2>
+                <div id="resultsList" class="results-list">
+                    <p class="placeholder">输入关键词开始搜索</p>
+                </div>
+            </section>
+
+            <!-- Document Detail Modal -->
+            <div id="detailModal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <div id="detailContent"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>科研资料检索助手 v1.0 | 所有样例均为合成内容</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

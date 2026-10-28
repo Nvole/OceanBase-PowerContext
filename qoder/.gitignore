@@ -1,0 +1,23 @@
+# Sensitive
+.env
+data/
+__pycache__/
+*.pyc
+*.db
+*.db-shm
+*.db-wal
+
+# Local scripts reading credentials
+scripts/submission_preflight_local.py
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.qoder/
+.local/
+.venv/
+.pytest_cache/
+connection.json
+*.log

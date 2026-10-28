@@ -1,0 +1,87 @@
+{
+  "checked_at": "2026-10-28T20:57:34.019440+08:00",
+  "database": "qoder_research",
+  "version": "5.7.25-OceanBase seekdb-v1.4.0.0",
+  "checks": [
+    {
+      "name": "server_ready",
+      "passed": true
+    },
+    {
+      "name": "expected_database_backend",
+      "passed": true
+    },
+    {
+      "name": "browser_upload_three_types",
+      "passed": true
+    },
+    {
+      "name": "browser_search_three_results",
+      "passed": true
+    },
+    {
+      "name": "browser_type_filter",
+      "passed": true
+    },
+    {
+      "name": "browser_document_detail",
+      "passed": true
+    },
+    {
+      "name": "browser_tag_filter",
+      "passed": true
+    },
+    {
+      "name": "browser_chinese_search",
+      "passed": true
+    },
+    {
+      "name": "duplicate_names_are_preserved",
+      "passed": true
+    },
+    {
+      "name": "browser_xss_search_not_executed",
+      "passed": true
+    },
+    {
+      "name": "browser_xss_detail_not_executed",
+      "passed": true
+    },
+    {
+      "name": "metadata_xss_rejected",
+      "passed": true
+    },
+    {
+      "name": "sql_injection_returns_no_unrelated_rows",
+      "passed": true
+    },
+    {
+      "name": "browser_delete_changes_search",
+      "passed": true
+    },
+    {
+      "name": "browser_no_javascript_errors",
+      "passed": true
+    },
+    {
+      "name": "before_restart_rows_exist",
+      "passed": true
+    },
+    {
+      "name": "seekdb_service_restart",
+      "passed": true
+    },
+    {
+      "name": "seekdb_restart_preserves_all_test_rows",
+      "passed": true
+    },
+    {
+      "name": "showcase_local_preview",
+      "passed": true
+    }
+  ],
+  "source": "Codex actual Chromium browser and SQL verification",
+  "status": "passed",
+  "verification_rows_removed": true,
+  "preexisting_documents_preserved": true
+}
