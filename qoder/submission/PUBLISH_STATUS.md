@@ -10,5 +10,5 @@
 网站仅展示作品与复现说明；FastAPI 和 seekdb 后端仍需按 README 在本地独立运行。仅发布 `site/index.html`，不上传数据库、真实凭据、`.env`、私有报名源码或其他项目。
 
 GitHub 仓库：https://github.com/Nvole/OceanBase-PowerContext
-分支：`2026-competition-ecosystem`
-提交：`ada63448d1fdc89fb9d2a076ba0335ff146ebb79`
+分支：https://github.com/Nvole/OceanBase-PowerContext/tree/2026-competition-ecosystem
+完整 commit SHA 以该分支最终推送后的最新提交为准。
