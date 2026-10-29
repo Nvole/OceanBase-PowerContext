@@ -66,6 +66,8 @@ def main() -> int:
         "workflow_status": data.get("status"),
         "workflow_run_id": data.get("id"),
         "task_id": data.get("task_id"),
+        "workflow_id": data.get("workflow_id"),
+        "total_steps": data.get("total_steps"),
         "input": sample,
         "outputs": outputs,
         "api_key_recorded": False,

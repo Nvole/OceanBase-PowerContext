@@ -13,9 +13,9 @@ workflow:
   environment_variables:
     - id: "b7c1a2e0-4d55-41d0-9a11-04d1f4e00001"
       name: DEBATE_API_BASE
-      value: "http://127.0.0.1:18604"
+      value: "http://host.docker.internal:18604"
       value_type: string
-      description: "辩论 HTTP 服务。只在能访问该回环地址的机器上使用。"
+      description: "Dify Docker 容器经 host.docker.internal 访问赛题 HTTP 服务；服务端内部使用 seekdb。"
   features:
     file_upload:
       enabled: false

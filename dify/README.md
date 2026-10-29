@@ -6,8 +6,8 @@ DSL 文件是 [docs/absurd_debate.dsl.yml](docs/absurd_debate.dsl.yml)。导入 
 
 ## 快速开始
 
-1. 启动 seekdb 工具服务，确保它能被 Dify 访问。原生同机运行可使用 `127.0.0.1:18604`；Dify 在 Docker 中运行时，使用宿主机地址（例如 `http://host.docker.internal:18604`），并让服务绑定 `0.0.0.0`。
-2. 在 Dify 1.12+ 中导入 `docs/absurd_debate.dsl.yml`，保留或修改环境变量 `DEBATE_API_BASE` 为上一步的地址。
+1. 启动 seekdb 工具服务，确保它能被 Dify 访问。原生同机运行可使用 `127.0.0.1:18604`；本次已验证的 Docker 方案使用 SSH 隧道将 `0.0.0.0:18604` 转发到 A6000 的 `127.0.0.1:18604`。
+2. 在 Dify 1.18.0 中导入 `docs/absurd_debate.dsl.yml`，确认环境变量 `DEBATE_API_BASE` 为 `http://host.docker.internal:18604`。
 3. 在 Dify 中发布 Workflow，复制该应用的 API Key。
 4. 设置 `DIFY_API_BASE` 和 `DIFY_API_KEY`，运行 `python src/run_dify_api.py`。成功后，脱敏运行证据写入 `results/dify_run.json`。
 
