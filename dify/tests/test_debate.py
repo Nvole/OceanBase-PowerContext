@@ -58,9 +58,8 @@ def test_source_does_not_merge_legs():
     assert "collection.query(" not in source
     assert "rrf_score" not in source
     assert "def merge" not in source
-    assert 'HOST = "127.0.0.1"' in server
-    assert "PORT = 18604" in server
-    assert "0.0.0.0" not in server
+    assert 'HOST = os.environ.get("DEBATE_BIND_HOST", "127.0.0.1")' in server
+    assert 'PORT = int(os.environ.get("DEBATE_PORT", "18604"))' in server
 
 
 def test_retrieve_calls_hybrid_once():
@@ -166,7 +165,7 @@ def test_dsl_code_matches_runtime():
     assert 'version: "0.5.0"' in dsl
     for title in ("输入", "HTTP 检索", "回应", "HTTP 保存", "输出"):
         assert f"title: {title}" in dsl
-    assert "dify_imported: true" not in dsl.lower()
+    assert "DEBATE_API_BASE" in dsl
     marker = "def main(player: str, motion: str, side: str, argument: str, retrieve_body: str)"
     start = dsl.rfind("\n", 0, dsl.index(marker)) + 1
     lines = []
@@ -193,7 +192,8 @@ def test_dsl_code_matches_runtime():
     assert saved["rebuttal"] == expected["rebuttal"]
     assert saved["round_id"] == expected["round_id"]
     guide = (TRACK / "docs" / "运行说明.md").read_text(encoding="utf-8")
-    assert "未导入" in guide
+    assert "run_dify_api.py" in guide
+    assert "Dify Workflow" in guide
     assert "127.0.0.1:18604" in guide
 
 

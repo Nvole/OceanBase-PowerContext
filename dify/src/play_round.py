@@ -1,6 +1,7 @@
-"""Play one round with curl, in the same order as the Dify DSL.
+"""Smoke-test the seekdb HTTP tool service used by the Dify workflow.
 
-This does not import the DSL into Dify. There is no Dify UI on this machine.
+The actual user-facing path is exercised by ``run_dify_api.py`` after the DSL
+has been imported into a Dify Workflow app.
 """
 import json
 import os
@@ -74,9 +75,8 @@ def main():
     log_file.close()
     report = {
         "application": "离谱辩题",
-        "dify_imported": False,
-        "dify_ui_available": False,
-        "note": "本机没有 Dify 界面，DSL 未导入。下面按 DSL 的顺序用 curl 打完一局：输入、HTTP 检索、回应、HTTP 保存、输出。",
+        "entrypoint": "backend_smoke_only",
+        "note": "This report validates the seekdb HTTP tool service. Run src/run_dify_api.py after importing the DSL to validate the Dify app main path.",
         "dsl": "docs/absurd_debate.dsl.yml",
         "orchestration": ["输入", "HTTP 检索", "回应", "HTTP 保存", "输出"],
         "bind": "127.0.0.1:18604",

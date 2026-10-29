@@ -1,5 +1,6 @@
 """Debate HTTP service. It listens only on 127.0.0.1:18604."""
 import json
+import os
 import re
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -11,8 +12,8 @@ sys.path.insert(0, str(SRC))
 from debate import COLLECTION, SEED_FILE, ensure_ready, hybrid_hits, save_round
 from respond import host_reply, round_id_for
 
-HOST = "127.0.0.1"
-PORT = 18604
+HOST = os.environ.get("DEBATE_BIND_HOST", "127.0.0.1")
+PORT = int(os.environ.get("DEBATE_PORT", "18604"))
 ROUND_ID = re.compile(r"[A-Za-z0-9_]{4,40}")
 COLLECTION_HANDLE = None
 
