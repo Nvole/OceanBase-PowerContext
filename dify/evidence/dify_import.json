@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-10-29T09:32:29.296979+00:00",
+  "dify_version": "1.12.0",
+  "app_id": "5667e745-f0b0-4517-a5e5-f625727c1444",
+  "import_status": "completed",
+  "published": true,
+  "dsl_sha256": "9c1d9ece0710cb47f0a365d89043111111b8cea5d0c0f60de3ebd410bf212c33",
+  "exported_from_real_dify": true,
+  "runtime_secrets_included": false
+}

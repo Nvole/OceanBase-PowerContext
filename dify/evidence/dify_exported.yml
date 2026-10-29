@@ -1,0 +1,489 @@
+app:
+  description: Dify 编排检索、规则主持、保存确认；seekdb 保存历史辩词。规则主持，不冒充大模型。
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: 离谱辩题 · Dify seekdb 实跑版
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables:
+  - description: Compose 内部后端地址；自有 Dify 部署需填写该容器实际可访问的地址。
+    id: b7c1a2e0-4d55-41d0-9a11-04d1f4e00001
+    name: DEBATE_API_BASE
+    selector:
+    - env
+    - DEBATE_API_BASE
+    value: http://debate:18604
+    value_type: string
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: 1733000101-source-1733000106-target
+      source: '1733000101'
+      sourceHandle: source
+      target: '1733000106'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: 1733000106-source-1733000102-target
+      source: '1733000106'
+      sourceHandle: source
+      target: '1733000102'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 1733000102-source-1733000103-target
+      source: '1733000102'
+      sourceHandle: source
+      target: '1733000103'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: http-request
+      id: 1733000103-source-1733000104-target
+      source: '1733000103'
+      sourceHandle: source
+      target: '1733000104'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 1733000104-source-1733000107-target
+      source: '1733000104'
+      sourceHandle: source
+      target: '1733000107'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: 1733000107-source-1733000105-target
+      source: '1733000107'
+      sourceHandle: source
+      target: '1733000105'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: 玩家输入辩手、辩题、立场和辩词。
+        selected: false
+        title: 输入
+        type: start
+        variables:
+        - label: 辩手
+          max_length: 24
+          options: []
+          required: true
+          type: text-input
+          variable: player
+        - label: 辩题
+          max_length: 40
+          options: []
+          required: true
+          type: text-input
+          variable: motion
+        - label: 立场
+          max_length: 8
+          options:
+          - 正方
+          - 反方
+          required: true
+          type: select
+          variable: side
+        - label: 辩词
+          max_length: 240
+          options: []
+          required: true
+          type: paragraph
+          variable: argument
+      height: 170
+      id: '1733000101'
+      position:
+        x: 80
+        y: 220
+      positionAbsolute:
+        x: 80
+        y: 220
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "def main(argument: str, motion: str) -> dict:\n    import json\n  \
+          \  return {\"request_body\": json.dumps({\"text\": argument, \"motion\"\
+          : motion, \"n_results\": 8}, ensure_ascii=False)}\n"
+        code_language: python3
+        desc: 安全序列化输入
+        outputs:
+          request_body:
+            type: string
+        title: 安全序列化输入
+        type: code
+        variables:
+        - value_selector:
+          - '1733000101'
+          - argument
+          variable: argument
+        - value_selector:
+          - '1733000101'
+          - motion
+          variable: motion
+      height: 140
+      id: '1733000106'
+      position:
+        x: 380
+        y: 220
+      positionAbsolute:
+        x: 380
+        y: 220
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - key: ''
+            type: text
+            value: '{{#1733000106.request_body#}}'
+          type: raw-text
+        desc: 调用本机服务，让 seekdb hybrid_search 检索旧辩词。
+        headers: 'Content-Type: application/json'
+        method: post
+        params: ''
+        selected: false
+        ssl_verify: true
+        timeout:
+          connect: 10
+          read: 30
+          write: 30
+        title: HTTP 检索
+        type: http-request
+        url: '{{#env.DEBATE_API_BASE#}}/v1/retrieve'
+      height: 140
+      id: '1733000102'
+      position:
+        x: 680
+        y: 220
+      positionAbsolute:
+        x: 680
+        y: 220
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "def main(player: str, motion: str, side: str, argument: str, retrieve_body:\
+          \ str, retrieve_status: float) -> dict:\n    import json\n    if int(retrieve_status)\
+          \ != 200:\n        raise ValueError(\"seekdb retrieval HTTP request failed\"\
+          )\n    if isinstance(retrieve_body, dict):\n        payload = retrieve_body\n\
+          \    else:\n        payload = json.loads(retrieve_body or \"{}\")\n    hits\
+          \ = payload.get(\"hits\") or []\n    opposite = {\"正方\": \"反方\", \"反方\"\
+          : \"正方\"}\n    pivots = (\n        (\"猫\", \"猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。\"\
+          ),\n        (\"税\", \"税单一出，连路过的影子都会要求退税。\"),\n        (\"冰箱\", \"冰箱投出的票一定是冷藏票，热食提案永远过不了。\"\
+          ),\n        (\"周一\", \"取消周一之后，周二会连夜改名，麻烦只是换了工牌。\"),\n        (\"梦想\", \"\
+          梦想按斤卖会缺斤短两，因为灵感在秤上会蒸发。\"),\n        (\"汤\", \"免费热汤一开放，全城的勺子都会来开会。\"),\n\
+          \        (\"雨\", \"雨没有编制，热汤却要进预算，财政局会先感冒。\"),\n        (\"投票\", \"投票权一发放，弃权的人会比菜叶子还多。\"\
+          ),\n    )\n    host_side = opposite.get(side, \"反方\")\n    cited_id = \"\
+          \"\n    cite = \"档案库这会儿没有更早的同题发言，本席只能现场抬杠。\"\n    if hits:\n        top\
+          \ = hits[0] or {}\n        cited_id = str(top.get(\"id\") or \"\")\n   \
+          \     who = (top.get(\"metadata\") or {}).get(\"player\") or \"某位旧辩手\"\n\
+          \        snippet = str(top.get(\"document\") or \"\").replace(\"\\n\", \"\
+          \ \")\n        if len(snippet) > 42:\n            snippet = snippet[:42]\
+          \ + \"…\"\n        cite = f\"我翻到旧档案 {cited_id}：{who}说过「{snippet}」。\"\n \
+          \   pivot = \"你的论证把音量当成了证据，音量越大，漏洞越亮。\"\n    blob = f\"{motion}{argument}\"\
+          \n    for key, line in pivots:\n        if key in blob:\n            pivot\
+          \ = line\n            break\n    bangs = argument.count(\"！\") + argument.count(\"\
+          !\")\n    score = 35 + (len(argument) % 40) + min(bangs, 4) * 6 + (8 if\
+          \ cited_id else 0)\n    score = max(1, min(score, 99))\n    rebuttal = (\n\
+          \        f\"主持人杠精站{host_side}。{player}，你以{side}主张「{motion}」。\"\n       \
+          \ f\"{cite}{pivot}\"\n        f\"所以本席不接受「{argument}」作为定论。\"\n        f\"\
+          离谱指数 {score}/99。下一句请给一个反例，不许只加感叹号。\"\n    )\n    value = 2166136261\n  \
+          \  for byte in f\"{player}|{motion}|{argument}\".encode(\"utf-8\"):\n  \
+          \      value ^= byte\n        value = (value * 16777619) & 0xFFFFFFFF\n\
+          \    round_id = f\"{value:08x}\"\n    save_body = json.dumps({\n       \
+          \ \"player\": player,\n        \"motion\": motion,\n        \"side\": side,\n\
+          \        \"argument\": argument,\n        \"rebuttal\": rebuttal,\n    \
+          \    \"score\": score,\n        \"cited_id\": cited_id,\n        \"round_id\"\
+          : round_id,\n        \"host_side\": host_side,\n    }, ensure_ascii=False)\n\
+          \    return {\n        \"rebuttal\": rebuttal,\n        \"score\": score,\n\
+          \        \"cited_id\": cited_id,\n        \"host_side\": host_side,\n  \
+          \      \"round_id\": round_id,\n        \"save_body\": save_body,\n    }\n"
+        code_language: python3
+        desc: 规则主持人根据检索到的旧档案抬杠。不调用大模型。
+        outputs:
+          cited_id:
+            type: string
+          host_side:
+            type: string
+          rebuttal:
+            type: string
+          round_id:
+            type: string
+          save_body:
+            type: string
+          score:
+            type: number
+        selected: false
+        title: 回应
+        type: code
+        variables:
+        - value_selector:
+          - '1733000101'
+          - player
+          variable: player
+        - value_selector:
+          - '1733000101'
+          - motion
+          variable: motion
+        - value_selector:
+          - '1733000101'
+          - side
+          variable: side
+        - value_selector:
+          - '1733000101'
+          - argument
+          variable: argument
+        - value_selector:
+          - '1733000102'
+          - body
+          variable: retrieve_body
+        - value_selector:
+          - '1733000102'
+          - status_code
+          variable: retrieve_status
+      height: 160
+      id: '1733000103'
+      position:
+        x: 980
+        y: 220
+      positionAbsolute:
+        x: 980
+        y: 220
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - key: ''
+            type: text
+            value: '{{#1733000103.save_body#}}'
+          type: raw-text
+        desc: 把玩家辩词和主持人回应写入 seekdb，服务端会 refresh_index。
+        headers: 'Content-Type: application/json'
+        method: post
+        params: ''
+        selected: false
+        ssl_verify: true
+        timeout:
+          connect: 10
+          read: 30
+          write: 30
+        title: HTTP 保存
+        type: http-request
+        url: '{{#env.DEBATE_API_BASE#}}/v1/save'
+      height: 140
+      id: '1733000104'
+      position:
+        x: 1280
+        y: 220
+      positionAbsolute:
+        x: 1280
+        y: 220
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "def main(saved_body: str, saved_status: float, retrieve_body: str,\
+          \ round_id: str, rebuttal: str, score: float, cited_id: str) -> dict:\n\
+          \    import json\n    if int(saved_status) != 200:\n        raise ValueError(\"\
+          seekdb save HTTP request failed\")\n    saved = json.loads(saved_body)\n\
+          \    expected = [\"p_\" + round_id, \"h_\" + round_id]\n    if saved.get(\"\
+          refreshed\") is not True or saved.get(\"ids\") != expected:\n        raise\
+          \ ValueError(\"seekdb write/refresh was not confirmed\")\n    retrieved\
+          \ = json.loads(retrieve_body)\n    if retrieved.get(\"fusion\") != \"seekdb_hybrid_rrf\"\
+          :\n        raise ValueError(\"seekdb hybrid retrieval was not used\")\n\
+          \    return {\n        \"rebuttal\": rebuttal, \"score\": score, \"cited_id\"\
+          : cited_id,\n        \"round_id\": round_id, \"saved\": json.dumps(saved,\
+          \ ensure_ascii=False),\n        \"retrieved_ids\": json.dumps([hit[\"id\"\
+          ] for hit in retrieved[\"hits\"]]),\n        \"fusion\": retrieved[\"fusion\"\
+          ],\n    }\n"
+        code_language: python3
+        desc: 确认 seekdb 写入成功
+        outputs:
+          cited_id:
+            type: string
+          fusion:
+            type: string
+          rebuttal:
+            type: string
+          retrieved_ids:
+            type: string
+          round_id:
+            type: string
+          saved:
+            type: string
+          score:
+            type: number
+        title: 确认 seekdb 写入成功
+        type: code
+        variables:
+        - value_selector:
+          - '1733000104'
+          - body
+          variable: saved_body
+        - value_selector:
+          - '1733000104'
+          - status_code
+          variable: saved_status
+        - value_selector:
+          - '1733000102'
+          - body
+          variable: retrieve_body
+        - value_selector:
+          - '1733000103'
+          - round_id
+          variable: round_id
+        - value_selector:
+          - '1733000103'
+          - rebuttal
+          variable: rebuttal
+        - value_selector:
+          - '1733000103'
+          - score
+          variable: score
+        - value_selector:
+          - '1733000103'
+          - cited_id
+          variable: cited_id
+      height: 140
+      id: '1733000107'
+      position:
+        x: 1580
+        y: 220
+      positionAbsolute:
+        x: 1580
+        y: 220
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: 把抬杠和保存结果交给玩家。
+        outputs:
+        - value_selector:
+          - '1733000107'
+          - rebuttal
+          value_type: string
+          variable: rebuttal
+        - value_selector:
+          - '1733000107'
+          - score
+          value_type: number
+          variable: score
+        - value_selector:
+          - '1733000107'
+          - cited_id
+          value_type: string
+          variable: cited_id
+        - value_selector:
+          - '1733000107'
+          - round_id
+          value_type: string
+          variable: round_id
+        - value_selector:
+          - '1733000107'
+          - saved
+          value_type: string
+          variable: saved
+        - value_selector:
+          - '1733000107'
+          - retrieved_ids
+          value_type: string
+          variable: retrieved_ids
+        - value_selector:
+          - '1733000107'
+          - fusion
+          value_type: string
+          variable: fusion
+        selected: false
+        title: 输出
+        type: end
+      height: 150
+      id: '1733000105'
+      position:
+        x: 1880
+        y: 220
+      positionAbsolute:
+        x: 1880
+        y: 220
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.75
+  rag_pipeline_variables: []

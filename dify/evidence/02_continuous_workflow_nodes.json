@@ -1,0 +1,306 @@
+{
+  "data": [
+    {
+      "id": "21584298-7822-4961-bc10-576f79d9e48c",
+      "index": 1,
+      "predecessor_node_id": null,
+      "node_id": "1733000101",
+      "node_type": "start",
+      "title": "输入",
+      "inputs": {
+        "player": "验收_63b72e0017",
+        "motion": "猫应该交税_63b72e0017",
+        "side": "正方",
+        "argument": "我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017",
+        "sys.files": [],
+        "sys.user_id": "验收_63b72e0017",
+        "sys.app_id": "5667e745-f0b0-4517-a5e5-f625727c1444",
+        "sys.workflow_id": "478c0897-ab48-4f1b-bc09-2064759a4d8d",
+        "sys.workflow_run_id": "d5b5050a-c6f2-4bc4-a89a-aed8c00df47a",
+        "sys.timestamp": 1793266454
+      },
+      "process_data": {},
+      "outputs": {
+        "player": "验收_63b72e0017",
+        "motion": "猫应该交税_63b72e0017",
+        "side": "正方",
+        "argument": "我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017",
+        "sys.files": [],
+        "sys.user_id": "验收_63b72e0017",
+        "sys.app_id": "5667e745-f0b0-4517-a5e5-f625727c1444",
+        "sys.workflow_id": "478c0897-ab48-4f1b-bc09-2064759a4d8d",
+        "sys.workflow_run_id": "d5b5050a-c6f2-4bc4-a89a-aed8c00df47a",
+        "sys.timestamp": 1793266454
+      },
+      "status": "succeeded",
+      "error": null,
+      "elapsed_time": 0.007947,
+      "execution_metadata": {},
+      "extras": {},
+      "created_at": 1793266454,
+      "created_by_role": "end_user",
+      "created_by_account": null,
+      "created_by_end_user": {
+        "id": "8719ea5b-f93d-4f87-8d54-7d0f458f5b21",
+        "type": "service-api",
+        "is_anonymous": false,
+        "session_id": "验收_63b72e0017"
+      },
+      "finished_at": 1793266454,
+      "inputs_truncated": false,
+      "outputs_truncated": false,
+      "process_data_truncated": false
+    },
+    {
+      "id": "0f1ab08b-a8cd-4607-9ce9-7d666271a5a1",
+      "index": 2,
+      "predecessor_node_id": null,
+      "node_id": "1733000106",
+      "node_type": "code",
+      "title": "安全序列化输入",
+      "inputs": {
+        "argument": "我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017",
+        "motion": "猫应该交税_63b72e0017"
+      },
+      "process_data": {},
+      "outputs": {
+        "request_body": "{\"text\": \"我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"motion\": \"猫应该交税_63b72e0017\", \"n_results\": 8}"
+      },
+      "status": "succeeded",
+      "error": null,
+      "elapsed_time": 0.060883,
+      "execution_metadata": {},
+      "extras": {},
+      "created_at": 1793266454,
+      "created_by_role": "end_user",
+      "created_by_account": null,
+      "created_by_end_user": {
+        "id": "8719ea5b-f93d-4f87-8d54-7d0f458f5b21",
+        "type": "service-api",
+        "is_anonymous": false,
+        "session_id": "验收_63b72e0017"
+      },
+      "finished_at": 1793266454,
+      "inputs_truncated": false,
+      "outputs_truncated": false,
+      "process_data_truncated": false
+    },
+    {
+      "id": "0295d357-9436-4292-ac56-bb7025bbeb99",
+      "index": 3,
+      "predecessor_node_id": null,
+      "node_id": "1733000102",
+      "node_type": "http-request",
+      "title": "HTTP 检索",
+      "inputs": {},
+      "process_data": {
+        "request": "POST /v1/retrieve HTTP/1.1\r\nHost: debate:18604\r\nContent-Type: application/json\r\nContent-Length: 93\r\n\r\n{\"text\": \"我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"motion\": \"猫应该交税_63b72e0017\", \"n_results\": 8}"
+      },
+      "outputs": {
+        "status_code": 200,
+        "body": "{\"collection\": \"dify_v2_debate\", \"fusion\": \"seekdb_hybrid_rrf\", \"keywords\": [\"交税\", \"阳光\", \"呼噜\"], \"query_text\": \"猫应该交税_63b72e0017\\n我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"hits\": [{\"id\": \"h_9e657c62\", \"document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 seed_cat_pro：阳光审计员说过「【辩题】猫应该交税 【立场】正方 【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「猫霸占窗台阳光却不交税！证人说\\\"喵\\\"。\\n我的编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\", \"metadata\": {\"role\": \"host\", \"side\": \"反方\", \"score\": 84, \"motion\": \"猫应该交税_63b72e0017\", \"player\": \"主持人杠精\", \"cited_id\": \"seed_cat_pro\", \"round_id\": \"9e657c62\"}, \"score\": 0.0325}, {\"id\": \"seed_cat_pro\", \"document\": \"【辩题】猫应该交税\\n【立场】正方\\n【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝征收阳光税。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"猫应该交税\", \"player\": \"阳光审计员\", \"cited_id\": \"\", \"round_id\": \"seed_cat_pro\"}, \"score\": 0.0323}, {\"id\": \"p_9e657c62\", \"document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】猫霸占窗台阳光却不交税！证人说\\\"喵\\\"。\\n我的编号：63b72e0017\", \"metadata\": {\"role\": \"player\", \"side\": \"正方\", \"score\": 84, \"motion\": \"猫应该交税_63b72e0017\", \"player\": \"验收_63b72e0017\", \"cited_id\": \"seed_cat_pro\", \"round_id\": \"9e657c62\"}, \"score\": 0.032}, {\"id\": \"seed_cat_con\", \"document\": \"【辩题】猫应该交税\\n【立场】反方\\n【发言】猫已经用抓沙发支付了租金，再征税就是对夜间巡逻的双重课税。\", \"metadata\": {\"role\": \"seed\", \"side\": \"反方\", \"score\": 0, \"motion\": \"猫应该交税\", \"player\": \"猫工会\", \"cited_id\": \"\", \"round_id\": \"seed_cat_con\"}, \"score\": 0.0313}, {\"id\": \"seed_soup\", \"document\": \"【辩题】雨天必须配给免费热汤\\n【立场】正方\\n【发言】淋雨属于公共天气事故，热汤是最低限度的市政救援。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"雨天必须配给免费热汤\", \"player\": \"汤匙大臣\", \"cited_id\": \"\", \"round_id\": \"seed_soup\"}, \"score\": 0.0154}, {\"id\": \"seed_fridge\", \"document\": \"【辩题】冰箱应该有投票权\\n【立场】正方\\n【发言】冰箱保管全家的口粮，比弃票的人类更了解民生。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"冰箱应该有投票权\", \"player\": \"冷藏代表\", \"cited_id\": \"\", \"round_id\": \"seed_fridge\"}, \"score\": 0.0152}, {\"id\": \"seed_monday\", \"document\": \"【辩题】周一应该被取消\\n【立场】正方\\n【发言】周一是对睡眠的恶意收购，建议并入周日作为附属休息日。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"周一应该被取消\", \"player\": \"被子议员\", \"cited_id\": \"\", \"round_id\": \"seed_monday\"}, \"score\": 0.0149}, {\"id\": \"seed_dream\", \"document\": \"【辩题】梦想可以按斤出售\\n【立场】反方\\n【发言】梦想一过秤就漏气，卖出去的都是包装，不是内容。\", \"metadata\": {\"role\": \"seed\", \"side\": \"反方\", \"score\": 0, \"motion\": \"梦想可以按斤出售\", \"player\": \"失眠店主\", \"cited_id\": \"\", \"round_id\": \"seed_dream\"}, \"score\": 0.0147}]}",
+        "headers": {
+          "server": "BaseHTTP/0.6 Python/3.11.14",
+          "date": "Thu, 29 Oct 2026 09:34:14 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "content-length": "3699",
+          "connection": "close"
+        },
+        "files": []
+      },
+      "status": "succeeded",
+      "error": null,
+      "elapsed_time": 0.049838,
+      "execution_metadata": {},
+      "extras": {},
+      "created_at": 1793266454,
+      "created_by_role": "end_user",
+      "created_by_account": null,
+      "created_by_end_user": {
+        "id": "8719ea5b-f93d-4f87-8d54-7d0f458f5b21",
+        "type": "service-api",
+        "is_anonymous": false,
+        "session_id": "验收_63b72e0017"
+      },
+      "finished_at": 1793266454,
+      "inputs_truncated": false,
+      "outputs_truncated": false,
+      "process_data_truncated": false
+    },
+    {
+      "id": "b8843fef-1fd8-4db7-839c-5f9cb709cb04",
+      "index": 4,
+      "predecessor_node_id": null,
+      "node_id": "1733000103",
+      "node_type": "code",
+      "title": "回应",
+      "inputs": {
+        "player": "验收_63b72e0017",
+        "motion": "猫应该交税_63b72e0017",
+        "side": "正方",
+        "argument": "我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017",
+        "retrieve_body": "{\"collection\": \"dify_v2_debate\", \"fusion\": \"seekdb_hybrid_rrf\", \"keywords\": [\"交税\", \"阳光\", \"呼噜\"], \"query_text\": \"猫应该交税_63b72e0017\\n我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"hits\": [{\"id\": \"h_9e657c62\", \"document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 seed_cat_pro：阳光审计员说过「【辩题】猫应该交税 【立场】正方 【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「猫霸占窗台阳光却不交税！证人说\\\"喵\\\"。\\n我的编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\", \"metadata\": {\"role\": \"host\", \"side\": \"反方\", \"score\": 84, \"motion\": \"猫应该交税_63b72e0017\", \"player\": \"主持人杠精\", \"cited_id\": \"seed_cat_pro\", \"round_id\": \"9e657c62\"}, \"score\": 0.0325}, {\"id\": \"seed_cat_pro\", \"document\": \"【辩题】猫应该交税\\n【立场】正方\\n【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝征收阳光税。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"猫应该交税\", \"player\": \"阳光审计员\", \"cited_id\": \"\", \"round_id\": \"seed_cat_pro\"}, \"score\": 0.0323}, {\"id\": \"p_9e657c62\", \"document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】猫霸占窗台阳光却不交税！证人说\\\"喵\\\"。\\n我的编号：63b72e0017\", \"metadata\": {\"role\": \"player\", \"side\": \"正方\", \"score\": 84, \"motion\": \"猫应该交税_63b72e0017\", \"player\": \"验收_63b72e0017\", \"cited_id\": \"seed_cat_pro\", \"round_id\": \"9e657c62\"}, \"score\": 0.032}, {\"id\": \"seed_cat_con\", \"document\": \"【辩题】猫应该交税\\n【立场】反方\\n【发言】猫已经用抓沙发支付了租金，再征税就是对夜间巡逻的双重课税。\", \"metadata\": {\"role\": \"seed\", \"side\": \"反方\", \"score\": 0, \"motion\": \"猫应该交税\", \"player\": \"猫工会\", \"cited_id\": \"\", \"round_id\": \"seed_cat_con\"}, \"score\": 0.0313}, {\"id\": \"seed_soup\", \"document\": \"【辩题】雨天必须配给免费热汤\\n【立场】正方\\n【发言】淋雨属于公共天气事故，热汤是最低限度的市政救援。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"雨天必须配给免费热汤\", \"player\": \"汤匙大臣\", \"cited_id\": \"\", \"round_id\": \"seed_soup\"}, \"score\": 0.0154}, {\"id\": \"seed_fridge\", \"document\": \"【辩题】冰箱应该有投票权\\n【立场】正方\\n【发言】冰箱保管全家的口粮，比弃票的人类更了解民生。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"冰箱应该有投票权\", \"player\": \"冷藏代表\", \"cited_id\": \"\", \"round_id\": \"seed_fridge\"}, \"score\": 0.0152}, {\"id\": \"seed_monday\", \"document\": \"【辩题】周一应该被取消\\n【立场】正方\\n【发言】周一是对睡眠的恶意收购，建议并入周日作为附属休息日。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"周一应该被取消\", \"player\": \"被子议员\", \"cited_id\": \"\", \"round_id\": \"seed_monday\"}, \"score\": 0.0149}, {\"id\": \"seed_dream\", \"document\": \"【辩题】梦想可以按斤出售\\n【立场】反方\\n【发言】梦想一过秤就漏气，卖出去的都是包装，不是内容。\", \"metadata\": {\"role\": \"seed\", \"side\": \"反方\", \"score\": 0, \"motion\": \"梦想可以按斤出售\", \"player\": \"失眠店主\", \"cited_id\": \"\", \"round_id\": \"seed_dream\"}, \"score\": 0.0147}]}",
+        "retrieve_status": 200
+      },
+      "process_data": {},
+      "outputs": {
+        "cited_id": "h_9e657c62",
+        "host_side": "反方",
+        "rebuttal": "主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。",
+        "round_id": "e4987e18",
+        "save_body": "{\"player\": \"验收_63b72e0017\", \"motion\": \"猫应该交税_63b72e0017\", \"side\": \"正方\", \"argument\": \"我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"rebuttal\": \"主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\", \"score\": 84, \"cited_id\": \"h_9e657c62\", \"round_id\": \"e4987e18\", \"host_side\": \"反方\"}",
+        "score": 84
+      },
+      "status": "succeeded",
+      "error": null,
+      "elapsed_time": 0.068542,
+      "execution_metadata": {},
+      "extras": {},
+      "created_at": 1793266454,
+      "created_by_role": "end_user",
+      "created_by_account": null,
+      "created_by_end_user": {
+        "id": "8719ea5b-f93d-4f87-8d54-7d0f458f5b21",
+        "type": "service-api",
+        "is_anonymous": false,
+        "session_id": "验收_63b72e0017"
+      },
+      "finished_at": 1793266454,
+      "inputs_truncated": false,
+      "outputs_truncated": false,
+      "process_data_truncated": false
+    },
+    {
+      "id": "b009eabe-29e7-4b6d-85ca-bca7904c7b66",
+      "index": 5,
+      "predecessor_node_id": null,
+      "node_id": "1733000104",
+      "node_type": "http-request",
+      "title": "HTTP 保存",
+      "inputs": {},
+      "process_data": {
+        "request": "POST /v1/save HTTP/1.1\r\nHost: debate:18604\r\nContent-Type: application/json\r\nContent-Length: 444\r\n\r\n{\"player\": \"验收_63b72e0017\", \"motion\": \"猫应该交税_63b72e0017\", \"side\": \"正方\", \"argument\": \"我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"rebuttal\": \"主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\", \"score\": 84, \"cited_id\": \"h_9e657c62\", \"round_id\": \"e4987e18\", \"host_side\": \"反方\"}"
+      },
+      "outputs": {
+        "status_code": 200,
+        "body": "{\"ids\": [\"p_e4987e18\", \"h_e4987e18\"], \"refreshed\": true, \"count\": 10, \"collection\": \"dify_v2_debate\", \"round_id\": \"e4987e18\", \"player_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"host_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\"}",
+        "headers": {
+          "server": "BaseHTTP/0.6 Python/3.11.14",
+          "date": "Thu, 29 Oct 2026 09:34:15 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "content-length": "946",
+          "connection": "close"
+        },
+        "files": []
+      },
+      "status": "succeeded",
+      "error": null,
+      "elapsed_time": 0.837157,
+      "execution_metadata": {},
+      "extras": {},
+      "created_at": 1793266454,
+      "created_by_role": "end_user",
+      "created_by_account": null,
+      "created_by_end_user": {
+        "id": "8719ea5b-f93d-4f87-8d54-7d0f458f5b21",
+        "type": "service-api",
+        "is_anonymous": false,
+        "session_id": "验收_63b72e0017"
+      },
+      "finished_at": 1793266455,
+      "inputs_truncated": false,
+      "outputs_truncated": false,
+      "process_data_truncated": false
+    },
+    {
+      "id": "e56587ea-c63e-4098-929a-5b25b4e7c3df",
+      "index": 6,
+      "predecessor_node_id": null,
+      "node_id": "1733000107",
+      "node_type": "code",
+      "title": "确认 seekdb 写入成功",
+      "inputs": {
+        "saved_body": "{\"ids\": [\"p_e4987e18\", \"h_e4987e18\"], \"refreshed\": true, \"count\": 10, \"collection\": \"dify_v2_debate\", \"round_id\": \"e4987e18\", \"player_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"host_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\"}",
+        "saved_status": 200,
+        "retrieve_body": "{\"collection\": \"dify_v2_debate\", \"fusion\": \"seekdb_hybrid_rrf\", \"keywords\": [\"交税\", \"阳光\", \"呼噜\"], \"query_text\": \"猫应该交税_63b72e0017\\n我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"hits\": [{\"id\": \"h_9e657c62\", \"document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 seed_cat_pro：阳光审计员说过「【辩题】猫应该交税 【立场】正方 【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「猫霸占窗台阳光却不交税！证人说\\\"喵\\\"。\\n我的编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\", \"metadata\": {\"role\": \"host\", \"side\": \"反方\", \"score\": 84, \"motion\": \"猫应该交税_63b72e0017\", \"player\": \"主持人杠精\", \"cited_id\": \"seed_cat_pro\", \"round_id\": \"9e657c62\"}, \"score\": 0.0325}, {\"id\": \"seed_cat_pro\", \"document\": \"【辩题】猫应该交税\\n【立场】正方\\n【发言】猫独占窗台阳光，属于无证垄断，应按呼噜分贝征收阳光税。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"猫应该交税\", \"player\": \"阳光审计员\", \"cited_id\": \"\", \"round_id\": \"seed_cat_pro\"}, \"score\": 0.0323}, {\"id\": \"p_9e657c62\", \"document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】猫霸占窗台阳光却不交税！证人说\\\"喵\\\"。\\n我的编号：63b72e0017\", \"metadata\": {\"role\": \"player\", \"side\": \"正方\", \"score\": 84, \"motion\": \"猫应该交税_63b72e0017\", \"player\": \"验收_63b72e0017\", \"cited_id\": \"seed_cat_pro\", \"round_id\": \"9e657c62\"}, \"score\": 0.032}, {\"id\": \"seed_cat_con\", \"document\": \"【辩题】猫应该交税\\n【立场】反方\\n【发言】猫已经用抓沙发支付了租金，再征税就是对夜间巡逻的双重课税。\", \"metadata\": {\"role\": \"seed\", \"side\": \"反方\", \"score\": 0, \"motion\": \"猫应该交税\", \"player\": \"猫工会\", \"cited_id\": \"\", \"round_id\": \"seed_cat_con\"}, \"score\": 0.0313}, {\"id\": \"seed_soup\", \"document\": \"【辩题】雨天必须配给免费热汤\\n【立场】正方\\n【发言】淋雨属于公共天气事故，热汤是最低限度的市政救援。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"雨天必须配给免费热汤\", \"player\": \"汤匙大臣\", \"cited_id\": \"\", \"round_id\": \"seed_soup\"}, \"score\": 0.0154}, {\"id\": \"seed_fridge\", \"document\": \"【辩题】冰箱应该有投票权\\n【立场】正方\\n【发言】冰箱保管全家的口粮，比弃票的人类更了解民生。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"冰箱应该有投票权\", \"player\": \"冷藏代表\", \"cited_id\": \"\", \"round_id\": \"seed_fridge\"}, \"score\": 0.0152}, {\"id\": \"seed_monday\", \"document\": \"【辩题】周一应该被取消\\n【立场】正方\\n【发言】周一是对睡眠的恶意收购，建议并入周日作为附属休息日。\", \"metadata\": {\"role\": \"seed\", \"side\": \"正方\", \"score\": 0, \"motion\": \"周一应该被取消\", \"player\": \"被子议员\", \"cited_id\": \"\", \"round_id\": \"seed_monday\"}, \"score\": 0.0149}, {\"id\": \"seed_dream\", \"document\": \"【辩题】梦想可以按斤出售\\n【立场】反方\\n【发言】梦想一过秤就漏气，卖出去的都是包装，不是内容。\", \"metadata\": {\"role\": \"seed\", \"side\": \"反方\", \"score\": 0, \"motion\": \"梦想可以按斤出售\", \"player\": \"失眠店主\", \"cited_id\": \"\", \"round_id\": \"seed_dream\"}, \"score\": 0.0147}]}",
+        "round_id": "e4987e18",
+        "rebuttal": "主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。",
+        "score": 84,
+        "cited_id": "h_9e657c62"
+      },
+      "process_data": {},
+      "outputs": {
+        "rebuttal": "主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。",
+        "score": 84,
+        "cited_id": "h_9e657c62",
+        "round_id": "e4987e18",
+        "saved": "{\"ids\": [\"p_e4987e18\", \"h_e4987e18\"], \"refreshed\": true, \"count\": 10, \"collection\": \"dify_v2_debate\", \"round_id\": \"e4987e18\", \"player_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"host_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\"}",
+        "retrieved_ids": "[\"h_9e657c62\", \"seed_cat_pro\", \"p_9e657c62\", \"seed_cat_con\", \"seed_soup\", \"seed_fridge\", \"seed_monday\", \"seed_dream\"]",
+        "fusion": "seekdb_hybrid_rrf"
+      },
+      "status": "succeeded",
+      "error": null,
+      "elapsed_time": 0.068763,
+      "execution_metadata": {},
+      "extras": {},
+      "created_at": 1793266455,
+      "created_by_role": "end_user",
+      "created_by_account": null,
+      "created_by_end_user": {
+        "id": "8719ea5b-f93d-4f87-8d54-7d0f458f5b21",
+        "type": "service-api",
+        "is_anonymous": false,
+        "session_id": "验收_63b72e0017"
+      },
+      "finished_at": 1793266455,
+      "inputs_truncated": false,
+      "outputs_truncated": false,
+      "process_data_truncated": false
+    },
+    {
+      "id": "0ebf2943-2115-42c6-b039-c445e68f1ac2",
+      "index": 7,
+      "predecessor_node_id": null,
+      "node_id": "1733000105",
+      "node_type": "end",
+      "title": "输出",
+      "inputs": {
+        "rebuttal": "主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。",
+        "score": 84,
+        "cited_id": "h_9e657c62",
+        "round_id": "e4987e18",
+        "saved": "{\"ids\": [\"p_e4987e18\", \"h_e4987e18\"], \"refreshed\": true, \"count\": 10, \"collection\": \"dify_v2_debate\", \"round_id\": \"e4987e18\", \"player_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"host_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\"}",
+        "retrieved_ids": "[\"h_9e657c62\", \"seed_cat_pro\", \"p_9e657c62\", \"seed_cat_con\", \"seed_soup\", \"seed_fridge\", \"seed_monday\", \"seed_dream\"]",
+        "fusion": "seekdb_hybrid_rrf"
+      },
+      "process_data": {},
+      "outputs": {
+        "rebuttal": "主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。",
+        "score": 84,
+        "cited_id": "h_9e657c62",
+        "round_id": "e4987e18",
+        "saved": "{\"ids\": [\"p_e4987e18\", \"h_e4987e18\"], \"refreshed\": true, \"count\": 10, \"collection\": \"dify_v2_debate\", \"round_id\": \"e4987e18\", \"player_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】正方\\n【发言】我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017\", \"host_document\": \"【辩题】猫应该交税_63b72e0017\\n【立场】反方\\n【发言】主持人杠精站反方。验收_63b72e0017，你以正方主张「猫应该交税_63b72e0017」。我翻到旧档案 h_9e657c62：主持人杠精说过「【辩题】猫应该交税_63b72e0017 【立场】反方 【发言】主持人杠精站反方。验…」。猫如果交税，税务局得先学会听懂呼噜，否则征到的只是毛。所以本席不接受「我还要为刚才的阳光税申请退款，呼噜也算劳动！编号：63b72e0017」作为定论。离谱指数 84/99。下一句请给一个反例，不许只加感叹号。\"}",
+        "retrieved_ids": "[\"h_9e657c62\", \"seed_cat_pro\", \"p_9e657c62\", \"seed_cat_con\", \"seed_soup\", \"seed_fridge\", \"seed_monday\", \"seed_dream\"]",
+        "fusion": "seekdb_hybrid_rrf"
+      },
+      "status": "succeeded",
+      "error": null,
+      "elapsed_time": 0.028463,
+      "execution_metadata": {},
+      "extras": {},
+      "created_at": 1793266455,
+      "created_by_role": "end_user",
+      "created_by_account": null,
+      "created_by_end_user": {
+        "id": "8719ea5b-f93d-4f87-8d54-7d0f458f5b21",
+        "type": "service-api",
+        "is_anonymous": false,
+        "session_id": "验收_63b72e0017"
+      },
+      "finished_at": 1793266455,
+      "inputs_truncated": false,
+      "outputs_truncated": false,
+      "process_data_truncated": false
+    }
+  ]
+}

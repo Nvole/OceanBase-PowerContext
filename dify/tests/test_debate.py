@@ -1,10 +1,14 @@
 """Checks for the absurd-debate service. Run with the project uv environment."""
 import json
 import math
+import os
 import re
 import sys
 import textwrap
 from pathlib import Path
+
+import pytest
+import yaml
 
 TRACK = Path(__file__).resolve().parents[1]
 SRC = TRACK / "src"
@@ -58,8 +62,10 @@ def test_source_does_not_merge_legs():
     assert "collection.query(" not in source
     assert "rrf_score" not in source
     assert "def merge" not in source
-    assert 'HOST = os.environ.get("DEBATE_BIND_HOST", "127.0.0.1")' in server
-    assert 'PORT = int(os.environ.get("DEBATE_PORT", "18604"))' in server
+    assert 'HOST = "127.0.0.1"' in server
+    assert "PORT = 18604" in server
+    assert 'os.environ.get("DEBATE_BIND", HOST)' in server
+    assert "ROOT /" not in source
 
 
 def test_retrieve_calls_hybrid_once():
@@ -115,6 +121,7 @@ def test_save_refreshes_before_return():
     assert saved["ids"] == ["p_abcd1234", "h_abcd1234"]
 
 
+@pytest.mark.skipif(os.environ.get("RUN_SEEKDB_TESTS") != "1", reason="Requires the dedicated real seekdb database")
 def test_real_hybrid_prefers_overlap():
     collection = ensure_ready()
     vector = [0.0] * 64
@@ -144,6 +151,7 @@ def test_real_hybrid_prefers_overlap():
         collection.delete(ids=ids)
 
 
+@pytest.mark.skipif(os.environ.get("RUN_SEEKDB_TESTS") != "1", reason="Requires the dedicated real seekdb database")
 def test_real_save_is_searchable():
     collection = ensure_ready()
     argument = "石榴干这个暗号只在测试回合出现一次。"
@@ -162,39 +170,50 @@ def test_real_save_is_searchable():
 
 def test_dsl_code_matches_runtime():
     dsl = (TRACK / "docs" / "absurd_debate.dsl.yml").read_text(encoding="utf-8")
-    assert 'version: "0.5.0"' in dsl
+    document = yaml.safe_load(dsl)
+    assert document["version"] == "0.5.0"
     for title in ("输入", "HTTP 检索", "回应", "HTTP 保存", "输出"):
         assert f"title: {title}" in dsl
-    assert "DEBATE_API_BASE" in dsl
-    marker = "def main(player: str, motion: str, side: str, argument: str, retrieve_body: str)"
-    start = dsl.rfind("\n", 0, dsl.index(marker)) + 1
-    lines = []
-    base = None
-    for line in dsl[start:].splitlines():
-        indent = len(line) - len(line.lstrip(" "))
-        if base is None:
-            base = indent
-            lines.append(line)
-            continue
-        if line.strip() and indent < base:
-            break
-        lines.append(line)
-    code = textwrap.dedent("\n".join(lines) + "\n")
+    assert "http://debate:18604" in dsl
+    nodes = {node["id"]: node for node in document["workflow"]["graph"]["nodes"]}
+    assert len(nodes) == 7
+    assert len(document["workflow"]["graph"]["edges"]) == 6
+    code = nodes["1733000103"]["data"]["code"]
     namespace = {}
     exec(code, namespace)
     hits = [{"id": "seed_cat_pro", "document": "旧档案发言", "metadata": {"player": "阳光审计员"}}]
     body = json.dumps({"hits": hits}, ensure_ascii=False)
-    produced = namespace["main"]("夜班辩手", "猫应该交税", "正方", "猫霸占阳光。", body)
+    produced = namespace["main"]("夜班辩手", "猫应该交税", "正方", "猫霸占阳光。", body, 200)
     expected = host_reply("夜班辩手", "猫应该交税", "正方", "猫霸占阳光。", hits)
     for key in ("rebuttal", "score", "cited_id", "host_side", "round_id"):
         assert produced[key] == expected[key]
     saved = json.loads(produced["save_body"])
     assert saved["rebuttal"] == expected["rebuttal"]
     assert saved["round_id"] == expected["round_id"]
-    guide = (TRACK / "docs" / "运行说明.md").read_text(encoding="utf-8")
-    assert "run_dify_api.py" in guide
-    assert "Dify Workflow" in guide
-    assert "127.0.0.1:18604" in guide
+    with pytest.raises(ValueError):
+        namespace["main"]("夜班辩手", "猫应该交税", "正方", "猫霸占阳光。", body, 500)
+
+
+def test_dsl_serializes_quotes_and_newlines():
+    document = yaml.safe_load((TRACK / "docs" / "absurd_debate.dsl.yml").read_text(encoding="utf-8"))
+    nodes = {node["id"]: node for node in document["workflow"]["graph"]["nodes"]}
+    namespace = {}
+    exec(nodes["1733000106"]["data"]["code"], namespace)
+    argument = '证人说"喵"\n又说：反对！\\'
+    actual = json.loads(namespace["main"](argument, "猫应该交税")["request_body"])
+    assert actual["text"] == argument
+    assert nodes["1733000102"]["data"]["body"]["type"] == "raw-text"
+
+
+def test_dsl_rejects_unsaved_results():
+    document = yaml.safe_load((TRACK / "docs" / "absurd_debate.dsl.yml").read_text(encoding="utf-8"))
+    node = next(node for node in document["workflow"]["graph"]["nodes"] if node["id"] == "1733000107")
+    namespace = {}
+    exec(node["data"]["code"], namespace)
+    with pytest.raises(ValueError):
+        namespace["main"]('{}', 500, '{}', 'abc123', '拒绝', 50, '')
+    with pytest.raises(ValueError):
+        namespace["main"]('{"refreshed": false, "ids": []}', 200, '{}', 'abc123', '拒绝', 50, '')
 
 
 def main():
@@ -207,6 +226,7 @@ def main():
     check("real_hybrid", test_real_hybrid_prefers_overlap)
     check("real_save", test_real_save_is_searchable)
     destination = TRACK / "results" / "test_report.json"
+    destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(json.dumps(REPORT, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("TEST_OK")
 

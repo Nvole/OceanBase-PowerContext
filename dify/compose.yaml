@@ -1,0 +1,161 @@
+name: oceanbase-dify-v2
+x-dify-environment: &dify-environment
+  SECRET_KEY: ${DIFY_SECRET_KEY:?Run scripts/configure.py first}
+  DB_TYPE: postgresql
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_USERNAME: dify
+  DB_PASSWORD: ${DIFY_DB_PASSWORD:?Run scripts/configure.py first}
+  DB_DATABASE: dify
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+  REDIS_PASSWORD: ${DIFY_REDIS_PASSWORD:?Run scripts/configure.py first}
+  CELERY_BROKER_URL: redis://:${DIFY_REDIS_PASSWORD}@redis:6379/1
+  STORAGE_TYPE: opendal
+  OPENDAL_SCHEME: fs
+  OPENDAL_FS_ROOT: /app/api/storage
+  CODE_EXECUTION_ENDPOINT: http://sandbox:8194
+  CODE_EXECUTION_API_KEY: ${DIFY_SANDBOX_KEY:?Run scripts/configure.py first}
+  PLUGIN_DAEMON_URL: http://plugin_daemon:5002
+  PLUGIN_DAEMON_KEY: ${DIFY_SANDBOX_KEY}
+  INNER_API_KEY_FOR_PLUGIN: ${DIFY_SECRET_KEY}
+  SSRF_PROXY_HTTP_URL: ''
+  SSRF_PROXY_HTTPS_URL: ''
+  CONSOLE_WEB_URL: http://127.0.0.1:${DIFY_WEB_PORT:-13000}
+  CONSOLE_API_URL: http://127.0.0.1:${DIFY_API_PORT:-15001}
+  SERVICE_API_URL: http://127.0.0.1:${DIFY_API_PORT:-15001}
+  APP_WEB_URL: http://127.0.0.1:${DIFY_WEB_PORT:-13000}
+  APP_API_URL: http://127.0.0.1:${DIFY_API_PORT:-15001}
+  CONSOLE_CORS_ALLOW_ORIGINS: http://127.0.0.1:${DIFY_WEB_PORT:-13000}
+  WEB_API_CORS_ALLOW_ORIGINS: http://127.0.0.1:${DIFY_WEB_PORT:-13000}
+  CHECK_UPDATE_URL: ''
+  MIGRATION_ENABLED: 'true'
+  SQLALCHEMY_POOL_SIZE: 5
+  SQLALCHEMY_MAX_OVERFLOW: 5
+  SERVER_WORKER_AMOUNT: 1
+services:
+  storage_init:
+    image: python:3.11.14-slim
+    user: '0:0'
+    command: ['chown', '-R', '1001:1001', '/app/api/storage']
+    volumes:
+      - dify-storage:/app/api/storage
+  postgres:
+    image: postgres:15.15-alpine
+    environment:
+      POSTGRES_USER: dify
+      POSTGRES_DB: dify
+      POSTGRES_PASSWORD: ${DIFY_DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U dify -d dify']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+  redis:
+    image: redis:6.2.20-alpine
+    command: ['redis-server', '--requirepass', '${DIFY_REDIS_PASSWORD}']
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+  sandbox:
+    image: langgenius/dify-sandbox:0.2.12
+    environment:
+      API_KEY: ${DIFY_SANDBOX_KEY}
+      GIN_MODE: release
+      ENABLE_NETWORK: 'true'
+      WORKER_TIMEOUT: 30
+    restart: unless-stopped
+  api:
+    image: langgenius/dify-api:1.12.0
+    environment:
+      <<: *dify-environment
+      MODE: api
+    depends_on:
+      storage_init:
+        condition: service_completed_successfully
+      plugin_daemon:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      sandbox:
+        condition: service_started
+    volumes:
+      - dify-storage:/app/api/storage
+    ports:
+      - '127.0.0.1:${DIFY_API_PORT:-15001}:5001'
+    restart: unless-stopped
+  worker:
+    image: langgenius/dify-api:1.12.0
+    profiles: ['worker']
+    environment:
+      <<: *dify-environment
+      MODE: worker
+      CELERY_WORKER_AMOUNT: 1
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - dify-storage:/app/api/storage
+    restart: unless-stopped
+  plugin_daemon:
+    image: langgenius/dify-plugin-daemon:0.5.3-local
+    environment:
+      <<: *dify-environment
+      DB_DATABASE: dify_plugin
+      SERVER_PORT: 5002
+      SERVER_KEY: ${DIFY_SANDBOX_KEY}
+      DIFY_INNER_API_URL: http://api:5001
+      DIFY_INNER_API_KEY: ${DIFY_SECRET_KEY}
+      PLUGIN_REMOTE_INSTALLING_HOST: '0.0.0.0'
+      PLUGIN_REMOTE_INSTALLING_PORT: 5003
+      MAX_PLUGIN_PACKAGE_SIZE: 52428800
+      FORCE_VERIFYING_SIGNATURE: 'true'
+      PYTHON_ENV_INIT_TIMEOUT: 120
+      PLUGIN_MAX_EXECUTION_TIMEOUT: 600
+      PLUGIN_WORKING_PATH: /app/storage/cwd
+      PLUGIN_STORAGE_TYPE: local
+      PLUGIN_STORAGE_LOCAL_ROOT: /app/storage
+      PLUGIN_INSTALLED_PATH: plugin
+      PLUGIN_PACKAGE_CACHE_PATH: plugin_packages
+      PLUGIN_MEDIA_CACHE_PATH: assets
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - plugin-storage:/app/storage
+    restart: unless-stopped
+  web:
+    image: langgenius/dify-web:1.12.0
+    environment:
+      CONSOLE_API_URL: http://127.0.0.1:${DIFY_API_PORT:-15001}
+      APP_API_URL: http://127.0.0.1:${DIFY_API_PORT:-15001}
+    ports:
+      - '127.0.0.1:${DIFY_WEB_PORT:-13000}:3000'
+    depends_on:
+      - api
+    restart: unless-stopped
+  debate:
+    build: .
+    environment:
+      SEEKDB_HOST: ${SEEKDB_HOST}
+      SEEKDB_PORT: ${SEEKDB_PORT:-2881}
+      SEEKDB_USER: ${SEEKDB_USER}
+      SEEKDB_PASSWORD: ${SEEKDB_PASSWORD}
+      SEEKDB_DATABASE: ${SEEKDB_DATABASE:-dify_v2_debate}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - '127.0.0.1:18604:18604'
+    restart: unless-stopped
+volumes:
+  postgres-data:
+  redis-data:
+  dify-storage:
+  plugin-storage:

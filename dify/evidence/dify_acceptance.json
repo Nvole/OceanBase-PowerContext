@@ -1,0 +1,91 @@
+{
+  "checked_at": "2026-10-29T09:34:07.925980+00:00",
+  "passed": true,
+  "entrypoint": "Dify published Workflow /v1/workflows/run",
+  "checks": {
+    "dify_rejects_invalid_app_token": true,
+    "01_first_workflow_dify_run_succeeded": true,
+    "01_first_workflow_seven_nodes_executed": true,
+    "01_first_workflow_seekdb_hybrid": true,
+    "01_first_workflow_write_confirmed": true,
+    "02_continuous_workflow_dify_run_succeeded": true,
+    "02_continuous_workflow_seven_nodes_executed": true,
+    "02_continuous_workflow_seekdb_hybrid": true,
+    "02_continuous_workflow_write_confirmed": true,
+    "new_memory_reused_by_next_dify_run": true,
+    "03_idempotent_workflow_dify_run_succeeded": true,
+    "03_idempotent_workflow_seven_nodes_executed": true,
+    "03_idempotent_workflow_seekdb_hybrid": true,
+    "03_idempotent_workflow_write_confirmed": true,
+    "retry_does_not_duplicate_cards": true,
+    "quotes_and_newlines_survive_dify": true,
+    "four_dify_generated_cards_exist_in_real_database": true,
+    "04_after_backend_restart_dify_run_succeeded": true,
+    "04_after_backend_restart_seven_nodes_executed": true,
+    "04_after_backend_restart_seekdb_hybrid": true,
+    "04_after_backend_restart_write_confirmed": true,
+    "backend_restart_preserves_seekdb_memory": true,
+    "01_first_workflow_node_execution_trace": true,
+    "02_continuous_workflow_node_execution_trace": true,
+    "03_idempotent_workflow_node_execution_trace": true,
+    "04_after_backend_restart_node_execution_trace": true
+  },
+  "source_sha256": {
+    "compose.yaml": "0f6fa28cde65587ea912e51d0f09351c47992e5b89bf11202ec36f7a25d7238d",
+    "data/sample_input.json": "46acad455b68dd7484e2a5b81d3bf04a69a26748da2a6130caa6be6e2e3e120c",
+    "data/seed_arguments.json": "09f2528613a090e6eed04412cda2a83c1c5d13da7889d6e2431eef96de797d4a",
+    "Dockerfile": "6757bb2f9fe284fc863a0c5083fe35a420c4e9540feb770719424e4cb4657b4b",
+    "docs/absurd_debate.dsl.yml": "9c1d9ece0710cb47f0a365d89043111111b8cea5d0c0f60de3ebd410bf212c33",
+    "requirements.txt": "80ec0fcfb3e0cbf29aa2d3bc8310c9db9f3776ab7a1665544bec77473daeba9f",
+    "scripts/build_dsl.py": "670d390fd94b5eff3fc4fca5880838bc1cc9508edc06c0bc1f6e9217ba5dccf3",
+    "scripts/configure.py": "677202c3a07c529fe409c383f1144e4e078d3cd63607654cb70ac650cdc08386",
+    "scripts/dify_client.py": "0c433c770a3084ff82859c4a020213176a62398ded930bbf03902b527708ee6d",
+    "scripts/import_dify.py": "c6dd67e79e94161a8105070be0dd0537b27fd7c91f90eb2e3eff4e13c7406c5a",
+    "scripts/start.py": "9c0330569e1f929c7ceec2950b07a8739f37ad43e63e33b98929974e209f972b",
+    "scripts/verify_dify.py": "535e58640ceb822daaa839ef5a7b49abd821dac26b6929d494d20b9adb0599f5",
+    "scripts/verify_submission.py": "49f64050f2f027448d76c790bfceb238ee8291c970d1473131c280b6781965af",
+    "src/db.py": "47735ec389d18fce1fdd911bbaafe93b08bf2fdf1cc5f1522db7531c05dea9fd",
+    "src/debate.py": "4a1bb93c5d9a8fac4f56ac963f973391086954beebcbf5fcbd3b68ce150e5656",
+    "src/hashvec.py": "15be1a71798934523b7c40c899bb829153523e3532a829f57713a5db8aab810d",
+    "src/initialize.py": "4276f0a4009ea1070dca4a9dbeb9cb33f32de3e0314ab23bb300839bf96a58fe",
+    "src/respond.py": "347418f364d9a4343f0b9d8d8dfc0997d586ec1f4d29b177f2f8473dc418824e",
+    "src/server.py": "2882949f5d47b5c9c1316c9dfdb6e3edee6795201f5731d6d006b8b7403a8e81"
+  },
+  "workflow_runs": [
+    {
+      "name": "01_first_workflow",
+      "run_id": "43b7842b-2073-47da-8f31-be5455433fea",
+      "status": "succeeded",
+      "total_steps": 7
+    },
+    {
+      "name": "02_continuous_workflow",
+      "run_id": "d5b5050a-c6f2-4bc4-a89a-aed8c00df47a",
+      "status": "succeeded",
+      "total_steps": 7
+    },
+    {
+      "name": "03_idempotent_workflow",
+      "run_id": "08101366-84eb-4ee8-9c85-83382537d8f1",
+      "status": "succeeded",
+      "total_steps": 7
+    },
+    {
+      "name": "04_after_backend_restart",
+      "run_id": "029f411a-4762-41ba-912e-a69db050a0c1",
+      "status": "succeeded",
+      "total_steps": 7
+    }
+  ],
+  "database": {
+    "version": "5.7.25-OceanBase seekdb-v1.4.0.0",
+    "database": "dify_v2_debate",
+    "collection": "dify_v2_debate",
+    "verified_ids": [
+      "p_9e657c62",
+      "h_9e657c62",
+      "p_e4987e18",
+      "h_e4987e18"
+    ]
+  }
+}

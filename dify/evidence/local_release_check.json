@@ -1,0 +1,6 @@
+{
+  "checked_at": "2026-10-29T09:47:57.934259+00:00",
+  "passed": false,
+  "anonymous_remote_clone": false,
+  "error": "Private files must not be committed: dify/.env, dify/.runtime/admin.json, dify/.runtime/app.json"
+}

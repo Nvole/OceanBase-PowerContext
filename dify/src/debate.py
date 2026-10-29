@@ -4,19 +4,17 @@ Vector and full-text hits are fused by seekdb RRF inside hybrid_search.
 This module does not merge the two result lists itself.
 """
 import json
+import os
 import re
-import sys
 from pathlib import Path
 
 from hashvec import DIM, hash_embed
 from pyseekdb import FulltextIndexConfig, HNSWConfiguration, Schema, VectorIndexConfig
 
 TRACK = Path(__file__).resolve().parents[1]
-ROOT = TRACK.parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
-from db import connect_collection_api  # noqa: E402
+from db import connect_collection_api
 
-COLLECTION = "track04_debate"
+COLLECTION = os.environ.get("DEBATE_COLLECTION", "dify_v2_debate")
 ENV_FILE = TRACK / ".env"
 SEED_FILE = TRACK / "data" / "seed_arguments.json"
 CONTENT_WORDS = (

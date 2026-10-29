@@ -5,6 +5,7 @@ import re
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from db import load_environment
 
 SRC = Path(__file__).resolve().parent
 sys.path.insert(0, str(SRC))
@@ -12,16 +13,17 @@ sys.path.insert(0, str(SRC))
 from debate import COLLECTION, SEED_FILE, ensure_ready, hybrid_hits, save_round
 from respond import host_reply, round_id_for
 
-HOST = os.environ.get("DEBATE_BIND_HOST", "127.0.0.1")
-PORT = int(os.environ.get("DEBATE_PORT", "18604"))
+HOST = "127.0.0.1"
+PORT = 18604
+load_environment()
+HOST = os.environ.get("DEBATE_BIND", HOST)
+PORT = int(os.environ.get("DEBATE_PORT", str(PORT)))
 ROUND_ID = re.compile(r"[A-Za-z0-9_]{4,40}")
 COLLECTION_HANDLE = None
 
 
 def ready():
     global COLLECTION_HANDLE
-    if not Path(SEED_FILE).parents[1].joinpath(".env").exists() and not (SRC.parent / ".env").exists():
-        raise SystemExit("missing track .env; refusing to start")
     COLLECTION_HANDLE = ensure_ready()
 
 
@@ -48,14 +50,13 @@ class Handler(BaseHTTPRequestHandler):
         raw = self.rfile.read(length) if length else b""
         if not raw:
             raise ValueError("JSON body required")
-        return json.loads(raw.decode("utf-8"))
+        payload = json.loads(raw.decode("utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError("JSON object required")
+        return payload
 
     def _fail(self, exc):
-        detail = str(exc)
-        message = type(exc).__name__
-        if "password" not in detail.lower() and "SEEKDB_" not in detail:
-            message = f"{message}: {detail[:300]}"
-        self._send(500, {"error": message})
+        self._send(500, {"error": type(exc).__name__, "detail": "Backend failure; check private server logs"})
 
     def _text(self, payload, key, limit, required=True):
         value = payload.get(key, "")
@@ -168,7 +169,7 @@ def main():
     server = HTTPServer((HOST, PORT), Handler)
     bound_host, bound_port = server.server_address[:2]
     if bound_host != HOST or bound_port != PORT:
-        raise RuntimeError("refusing to bind any address other than 127.0.0.1:18604")
+        raise RuntimeError("unexpected bind address")
     print(f"listening http://{HOST}:{PORT}", flush=True)
     server.serve_forever()
 
