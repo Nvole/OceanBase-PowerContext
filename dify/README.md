@@ -10,6 +10,7 @@
 - 后端依赖全部位于本目录，删除了仓库外 scripts/db.py 依赖。
 - Dify、seekdb、插件守护进程和沙箱版本已固定；网络地址使用 Compose 内可解析的 http://debate:18604，不使用容器内 localhost。
 - 提交前必须把本目录完整推送到目标分支，并使用真实的远端分支 HEAD 做匿名 fresh clone 校验。
+- 可直接照做的输入、输出、连续记忆和重置样例见 `docs/verification_sample.md`。
 
 ## 运行边界
 

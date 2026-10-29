@@ -16,6 +16,7 @@ REQUIRED = (
     "README.md", "requirements.txt", "compose.yaml", "Dockerfile", ".env.example", ".gitignore",
     "src/db.py", "src/server.py", "src/debate.py", "src/respond.py", "src/hashvec.py", "src/initialize.py",
     "scripts/import_dify.py", "scripts/verify_dify.py", "scripts/configure.py", "scripts/dify_client.py",
+    "docs/verification_sample.md",
     "docs/absurd_debate.dsl.yml", "data/seed_arguments.json", "evidence/dify_import.json", "evidence/dify_acceptance.json",
 )
 

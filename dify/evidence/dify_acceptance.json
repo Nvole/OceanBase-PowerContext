@@ -43,7 +43,7 @@
     "scripts/import_dify.py": "c6dd67e79e94161a8105070be0dd0537b27fd7c91f90eb2e3eff4e13c7406c5a",
     "scripts/start.py": "9c0330569e1f929c7ceec2950b07a8739f37ad43e63e33b98929974e209f972b",
     "scripts/verify_dify.py": "535e58640ceb822daaa839ef5a7b49abd821dac26b6929d494d20b9adb0599f5",
-    "scripts/verify_submission.py": "49f64050f2f027448d76c790bfceb238ee8291c970d1473131c280b6781965af",
+    "scripts/verify_submission.py": "121185ff835d93a72bb01738090097c981fbbd23f98cbce4cdd696b281e9afe5",
     "src/db.py": "47735ec389d18fce1fdd911bbaafe93b08bf2fdf1cc5f1522db7531c05dea9fd",
     "src/debate.py": "23ef1b0ec72c0abffa9806c6e1d7b87619e0764d72b661e0a41a45c301d45ffd",
     "src/hashvec.py": "01f6757b82b449a0db51585c52a12e029b9d40e650305db32d8676d183f53c9a",
