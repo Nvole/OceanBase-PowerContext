@@ -70,3 +70,7 @@ Pull requests should link the relevant issue or RFC, explain the rationale, summ
 ## Security & Configuration Tips
 
 Do not commit secrets, local virtual environments, caches, `.powercontext/`, `dist/`, or generated website output. Keep dependency changes reflected in `uv.lock`, and use `make check` to catch lock drift before review.
+
+## Competition Orchestration (2026 OceanBase)
+
+本仓库同时是 2026 OceanBase 大赛比赛仓库。执行多模型编排（Astra 派工、DeepSeek/GLM-5.3 编码）时，先读 ORCHESTRATION.md 并严格执行。要点：Astra 只做方案/派工/审查/验证，不亲自写业务代码；派工用 /data/home/bin/run-worker（默认 ds，难题 glm）；平台每天只有 10 次提交，全队共享，Astra 与工人永不提交，只向馒头报告「可提交」并附验证证据；每次提交必须是当前最好成绩。
